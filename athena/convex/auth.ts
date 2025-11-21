@@ -4,5 +4,5 @@ import GitHub from "@auth/core/providers/github";
 import Google from "@auth/core/providers/google";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Password, GitHub],
+  providers: [Password, GitHub, Google],
 });
