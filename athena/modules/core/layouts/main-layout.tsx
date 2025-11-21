@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  Building2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/modules/core/ui/avatar";
 import { Button } from "@/modules/core/ui/button";
@@ -24,10 +25,8 @@ import {
 } from "@/modules/core/ui/tooltip";
 
 const navItems = [
-  { icon: Home, label: "Home", href: "/" },
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: FileText, label: "Documents", href: "/documents" },
-  { icon: Users, label: "Team", href: "/team" },
+  { icon: Home, label: "Dashboard", href: "/" },
+  { icon: Building2, label: "Organizations", href: "/organizations" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: MessageSquare, label: "Messages", href: "/messages" },
   { icon: Settings, label: "Settings", href: "/settings" },
@@ -201,7 +200,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Main Content with Dim Background */}
-        <main className="flex-1 overflow-y-auto bg-background-dim p-6">
+        <main className="flex-1 overflow-y-auto bg-background-dim">
           {children}
         </main>
       </div>
