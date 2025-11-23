@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
-  LayoutDashboard,
-  FileText,
   Settings,
-  Users,
   BarChart3,
   MessageSquare,
   ChevronLeft,
@@ -23,6 +20,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/modules/core/ui/tooltip";
+import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import { getInitials } from "../lib/format";
 
 const navItems = [
   { icon: Home, label: "Dashboard", href: "/" },
@@ -35,6 +36,8 @@ const navItems = [
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const pathname = usePathname();
+  const router = useRouter();
+  const profile = useQuery(api.profile.getProfile);
 
   return (
     <div className="flex flex-row h-screen w-full bg-white overflow-hidden">
@@ -117,34 +120,75 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
+                  onClick={() => router.push("/profile")}
                   className={`flex items-center gap-3 p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer ${
                     !isExpanded && "justify-center"
                   }`}
                 >
-                  <Avatar className="h-9 w-9 shrink-0">
-                    <AvatarImage src="https://avatar.vercel.sh/user" />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      JD
-                    </AvatarFallback>
-                  </Avatar>
-                  {isExpanded && (
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        John Doe
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        john@example.com
-                      </p>
-                    </div>
+                  {profile === undefined ? (
+                    // Loading state
+                    <>
+                      <div className="h-9 w-9 shrink-0 rounded-full bg-muted animate-pulse" />
+                      {isExpanded && (
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="h-4 bg-muted rounded animate-pulse w-24" />
+                          <div className="h-3 bg-muted rounded animate-pulse w-32" />
+                        </div>
+                      )}
+                    </>
+                  ) : profile === null ? (
+                    // Not logged in
+                    <>
+                      <Avatar className="h-9 w-9 shrink-0">
+                        <AvatarFallback className="bg-muted text-muted-foreground">
+                          G
+                        </AvatarFallback>
+                      </Avatar>
+                      {isExpanded && (
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            Guest
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            Not logged in
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    // Logged in user
+                    <>
+                      <Avatar className="h-9 w-9 shrink-0">
+                        {profile.image && (
+                          <AvatarImage
+                            src={profile.image}
+                            alt={profile.name || "User"}
+                          />
+                        )}
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getInitials(profile.name, profile.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {isExpanded && (
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {profile.name || "User"}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {profile.email || "No email"}
+                          </p>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </TooltipTrigger>
-              {!isExpanded && (
+              {!isExpanded && profile && (
                 <TooltipContent side="right">
                   <div>
-                    <p className="font-medium">John Doe</p>
+                    <p className="font-medium">{profile.name || "User"}</p>
                     <p className="text-xs text-muted-foreground">
-                      john@example.com
+                      {profile.email || "No email"}
                     </p>
                   </div>
                 </TooltipContent>
@@ -181,6 +225,8 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <div className="w-px h-6 bg-border" />
             <Button
               variant="outline"
               size="sm"

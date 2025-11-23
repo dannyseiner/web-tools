@@ -1,0 +1,14 @@
+{
+  "config": {
+    "appName": "Athena CS"
+  },
+  "pages": {
+    "dashboard": {},
+    "organizations": {},
+    "auth": {}
+  },
+  "components": {},
+  "modules": {
+    "i18n": {}
+  }
+}

@@ -30,4 +30,9 @@ export const orgTables = {
       v.literal("Enterprise"),
     ),
   }).index("by_organizationId", ["organizationId"]),
+
+  organizationSettings: defineTable({
+    organizationId: v.id("organizations"),
+    apiKey: v.string(),
+  }),
 };

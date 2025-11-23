@@ -12,6 +12,8 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as organization from "../organization.js";
+import type * as organizations from "../organizations.js";
+import type * as profile from "../profile.js";
 import type * as schemes_organization from "../schemes/organization.js";
 
 import type {
@@ -25,6 +27,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   myFunctions: typeof myFunctions;
   organization: typeof organization;
+  organizations: typeof organizations;
+  profile: typeof profile;
   "schemes/organization": typeof schemes_organization;
 }>;
 
