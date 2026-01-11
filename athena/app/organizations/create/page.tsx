@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/modules/core/ui/input";
 import { useLoader } from "@/modules/core/hooks/use-loader";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 type CreateOrgFormData = {
   name: string;
@@ -33,18 +34,22 @@ function CreateOrganizationPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const t = useTranslations();
-  
+
   const createOrgSchema = z.object({
     name: z
       .string()
-      .min(1, t('pages.organizationsCreate.validation.nameRequired'))
-      .min(3, t('pages.organizationsCreate.validation.nameMinLength'))
-      .max(50, t('pages.organizationsCreate.validation.nameMaxLength')),
+      .min(1, t("pages.organizationsCreate.validation.nameRequired"))
+      .min(3, t("pages.organizationsCreate.validation.nameMinLength"))
+      .max(50, t("pages.organizationsCreate.validation.nameMaxLength")),
     description: z
       .string()
-      .max(200, t('pages.organizationsCreate.validation.descMaxLength'))
+      .max(200, t("pages.organizationsCreate.validation.descMaxLength"))
       .optional(),
-    image: z.string().url(t('pages.organizationsCreate.validation.imageInvalid')).optional().or(z.literal("")),
+    image: z
+      .string()
+      .url(t("pages.organizationsCreate.validation.imageInvalid"))
+      .optional()
+      .or(z.literal("")),
   });
 
   const {
@@ -61,8 +66,8 @@ function CreateOrganizationPage() {
   const onSubmit = async (data: CreateOrgFormData) => {
     setLoading({
       loading: true,
-      title: t('pages.organizationsCreate.creatingOrg'),
-      description: t('pages.organizationsCreate.creatingOrgDesc'),
+      title: t("pages.organizationsCreate.creatingOrg"),
+      description: t("pages.organizationsCreate.creatingOrgDesc"),
     });
     setError(null);
 
@@ -76,8 +81,8 @@ function CreateOrganizationPage() {
       setIsSuccess(true);
       setLoading({
         loading: true,
-        title: t('pages.organizationsCreate.orgCreated'),
-        description: t('pages.organizationsCreate.orgCreatedDesc'),
+        title: t("pages.organizationsCreate.orgCreated"),
+        description: t("pages.organizationsCreate.orgCreatedDesc"),
         state: "success",
       });
 
@@ -86,11 +91,16 @@ function CreateOrganizationPage() {
         router.push(`/organizations/${result.organizationId}`);
       }, 1500);
     } catch (error) {
-      setError(error instanceof Error ? error.message : t('pages.organizationsCreate.failedToCreate'));
+      setError(
+        error instanceof Error
+          ? error.message
+          : t("pages.organizationsCreate.failedToCreate"),
+      );
       setLoading({
         loading: false,
-        title: t('pages.organizationsCreate.errorCreatingOrg'),
-        description: error instanceof Error ? error.message : t('errors.unknownError'),
+        title: t("pages.organizationsCreate.errorCreatingOrg"),
+        description:
+          error instanceof Error ? error.message : t("errors.unknownError"),
         state: "error",
       });
     }
@@ -102,7 +112,7 @@ function CreateOrganizationPage() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
         delay: custom * 0.1,
@@ -111,7 +121,7 @@ function CreateOrganizationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-accent/5">
       <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Back Button */}
         <motion.button
@@ -124,7 +134,7 @@ function CreateOrganizationPage() {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="h-5 w-5" />
-          {t('pages.organizationsCreate.backToOrganizations')}
+          {t("pages.organizationsCreate.backToOrganizations")}
         </motion.button>
 
         {/* Header */}
@@ -134,14 +144,14 @@ function CreateOrganizationPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-orange-600 mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-primary to-orange-600 mb-4 shadow-lg">
             <Building2 className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            {t('pages.organizationsCreate.title')}
+            {t("pages.organizationsCreate.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t('pages.organizationsCreate.subtitle')}
+            {t("pages.organizationsCreate.subtitle")}
           </p>
         </motion.div>
 
@@ -164,19 +174,20 @@ function CreateOrganizationPage() {
                 htmlFor="name"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                {t('pages.organizationsCreate.nameLabel')} <span className="text-destructive">{t('common.required')}</span>
+                {t("pages.organizationsCreate.nameLabel")}{" "}
+                <span className="text-destructive">{t("common.required")}</span>
               </label>
               <Input
                 id="name"
                 type="text"
-                placeholder={t('pages.organizationsCreate.namePlaceholder')}
+                placeholder={t("pages.organizationsCreate.namePlaceholder")}
                 icon={{ name: Building2, position: "left" }}
                 error={errors.name?.message}
                 aria-invalid={!!errors.name}
                 {...register("name")}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('pages.organizationsCreate.nameHint')}
+                {t("pages.organizationsCreate.nameHint")}
               </p>
             </motion.div>
 
@@ -191,12 +202,17 @@ function CreateOrganizationPage() {
                 htmlFor="description"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                {t('pages.organizationsCreate.descriptionLabel')} <span className="text-muted-foreground">{t('common.optional')}</span>
+                {t("pages.organizationsCreate.descriptionLabel")}{" "}
+                <span className="text-muted-foreground">
+                  {t("common.optional")}
+                </span>
               </label>
               <textarea
                 id="description"
                 rows={4}
-                placeholder={t('pages.organizationsCreate.descriptionPlaceholder')}
+                placeholder={t(
+                  "pages.organizationsCreate.descriptionPlaceholder",
+                )}
                 className={`w-full px-4 py-3 bg-background border ${
                   errors.description
                     ? "border-destructive focus:ring-destructive"
@@ -210,7 +226,7 @@ function CreateOrganizationPage() {
                 </p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
-                {t('pages.organizationsCreate.descriptionHint')}
+                {t("pages.organizationsCreate.descriptionHint")}
               </p>
             </motion.div>
 
@@ -225,19 +241,22 @@ function CreateOrganizationPage() {
                 htmlFor="image"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                {t('pages.organizationsCreate.imageLabel')} <span className="text-muted-foreground">{t('common.optional')}</span>
+                {t("pages.organizationsCreate.imageLabel")}{" "}
+                <span className="text-muted-foreground">
+                  {t("common.optional")}
+                </span>
               </label>
               <Input
                 id="image"
                 type="url"
-                placeholder={t('pages.organizationsCreate.imagePlaceholder')}
+                placeholder={t("pages.organizationsCreate.imagePlaceholder")}
                 icon={{ name: ImageIcon, position: "left" }}
                 error={errors.image?.message}
                 aria-invalid={!!errors.image}
                 {...register("image")}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('pages.organizationsCreate.imageHint')}
+                {t("pages.organizationsCreate.imageHint")}
               </p>
 
               {/* Image Preview */}
@@ -249,19 +268,18 @@ function CreateOrganizationPage() {
                   className="mt-4 p-4 border border-border rounded-lg bg-background"
                 >
                   <p className="text-xs font-medium text-foreground mb-2">
-                    {t('pages.organizationsCreate.logoPreview')}
+                    {t("pages.organizationsCreate.logoPreview")}
                   </p>
                   <div className="flex items-center gap-4">
-                    <img
+                    <Image
                       src={imageUrl}
                       alt="Organization logo preview"
+                      width={64}
+                      height={64}
                       className="w-16 h-16 rounded-xl object-cover border border-border shadow-sm bg-white"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
                     />
                     <div className="text-xs text-muted-foreground">
-                      {t('pages.organizationsCreate.logoPreviewHint')}
+                      {t("pages.organizationsCreate.logoPreviewHint")}
                     </div>
                   </div>
                 </motion.div>
@@ -293,7 +311,7 @@ function CreateOrganizationPage() {
                 >
                   <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
                   <div className="text-sm text-green-600">
-                    {t('pages.organizationsCreate.successMessage')}
+                    {t("pages.organizationsCreate.successMessage")}
                   </div>
                 </motion.div>
               )}
@@ -315,7 +333,7 @@ function CreateOrganizationPage() {
                 disabled={isSubmitting || isSuccess}
                 className="flex-1 bg-background hover:bg-accent text-foreground font-semibold py-3 rounded-lg border border-border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('common.cancel')}
+                {t("common.cancel")}
               </motion.button>
 
               <motion.button
@@ -328,12 +346,12 @@ function CreateOrganizationPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    {t('pages.organizationsCreate.creating')}
+                    {t("pages.organizationsCreate.creating")}
                   </>
                 ) : (
                   <>
                     <Building2 className="h-5 w-5" />
-                    {t('pages.organizations.createOrganization')}
+                    {t("pages.organizations.createOrganization")}
                   </>
                 )}
               </motion.button>
@@ -349,20 +367,20 @@ function CreateOrganizationPage() {
           className="mt-8 bg-primary/5 border border-primary/10 rounded-xl p-6"
         >
           <h3 className="text-sm font-semibold text-foreground mb-2">
-            {t('pages.organizationsCreate.whatHappensNext')}
+            {t("pages.organizationsCreate.whatHappensNext")}
           </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>{t('pages.organizationsCreate.step1')}</span>
+              <span>{t("pages.organizationsCreate.step1")}</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>{t('pages.organizationsCreate.step2')}</span>
+              <span>{t("pages.organizationsCreate.step2")}</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>{t('pages.organizationsCreate.step3')}</span>
+              <span>{t("pages.organizationsCreate.step3")}</span>
             </li>
           </ul>
         </motion.div>
