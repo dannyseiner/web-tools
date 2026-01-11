@@ -26,38 +26,170 @@ import { Input } from "@/modules/core/ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { LucideIcon } from "lucide-react";
+import { UseFormRegisterReturn } from "react-hook-form";
+import { Variants } from "motion/react";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
-});
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
-const registerSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .min(2, "Name must be at least 2 characters"),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
-});
+type RegisterFormData = {
+  name: string;
+  email: string;
+  password: string;
+};
 
-type LoginFormData = z.infer<typeof loginSchema>;
-type RegisterFormData = z.infer<typeof registerSchema>;
+type FormFieldProps = {
+  custom: number;
+  label: string;
+  id: string;
+  type: string;
+  autoComplete?: string;
+  placeholder: string;
+  icon: LucideIcon;
+  error?: string;
+  register: UseFormRegisterReturn;
+  variants: Variants;
+};
+
+const FormField = ({
+  custom,
+  label,
+  id,
+  type,
+  autoComplete,
+  placeholder,
+  icon,
+  error,
+  register,
+  variants,
+}: FormFieldProps) => (
+  <motion.div
+    custom={custom}
+    variants={variants}
+    initial="hidden"
+    animate="visible"
+  >
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-foreground mb-2"
+    >
+      {label}
+    </label>
+    <Input
+      id={id}
+      type={type}
+      autoComplete={autoComplete}
+      placeholder={placeholder}
+      icon={{ name: icon, position: "left" }}
+      error={error}
+      aria-invalid={!!error}
+      {...register}
+    />
+  </motion.div>
+);
+
+const SubmitButton = ({
+  custom,
+  variants,
+  children,
+}: {
+  custom: number;
+  variants: Variants;
+  children: React.ReactNode;
+}) => (
+  <motion.button
+    custom={custom}
+    variants={variants}
+    initial="hidden"
+    animate="visible"
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    type="submit"
+    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+  >
+    {children}
+  </motion.button>
+);
+
+const FormDivider = ({
+  custom,
+  variants,
+  text,
+}: {
+  custom: number;
+  variants: Variants;
+  text: string;
+}) => (
+  <motion.div
+    custom={custom}
+    variants={variants}
+    initial="hidden"
+    animate="visible"
+    className="relative flex items-center justify-center"
+  >
+    <div className="absolute inset-0 flex items-center">
+      <div className="w-full border-t border-border" />
+    </div>
+    <div className="relative px-4 text-sm text-muted-foreground bg-card">
+      {text}
+    </div>
+  </motion.div>
+);
+
+const SocialButton = ({
+  onClick,
+  icon,
+  children,
+}: {
+  onClick: () => void;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <motion.button
+    type="button"
+    onClick={onClick}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="flex items-center justify-center gap-2 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium text-sm"
+  >
+    {icon}
+    {children}
+  </motion.button>
+);
 
 export default function Auth() {
+  const t = useTranslations();
   const { signIn } = useAuthActions();
+
+  const loginSchema = z.object({
+    email: z
+      .string()
+      .min(1, t("auth.validation.emailRequired"))
+      .email(t("auth.validation.emailInvalid")),
+    password: z
+      .string()
+      .min(1, t("auth.validation.passwordRequired"))
+      .min(8, t("auth.validation.passwordMinLength")),
+  });
+
+  const registerSchema = z.object({
+    name: z
+      .string()
+      .min(1, t("auth.validation.nameRequired"))
+      .min(2, t("auth.validation.nameMinLength")),
+    email: z
+      .string()
+      .min(1, t("auth.validation.emailRequired"))
+      .email(t("auth.validation.emailInvalid")),
+    password: z
+      .string()
+      .min(1, t("auth.validation.passwordRequired"))
+      .min(8, t("auth.validation.passwordMinLength")),
+  });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,8 +223,8 @@ export default function Auth() {
   const handleLogin = async (data: LoginFormData) => {
     setLoading({
       loading: true,
-      title: "Logging in",
-      description: "We are logging you in...",
+      title: t("auth.loggingIn"),
+      description: t("auth.loggingInDesc"),
     });
     setError(null);
 
@@ -105,17 +237,17 @@ export default function Auth() {
       await signIn("password", formData);
       setLoading({
         loading: true,
-        title: "Logged in",
-        description: "You have been logged in successfully",
+        title: t("auth.loggedIn"),
+        description: t("auth.loggedInDesc"),
         state: "success",
       });
       router.push("/");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("errors.generic"));
       setLoading({
         loading: false,
-        title: "Error logging in",
-        description: "An error occurred while logging you in",
+        title: t("auth.errorLoggingIn"),
+        description: t("auth.errorLoggingInDesc"),
         state: "error",
       });
     }
@@ -124,8 +256,8 @@ export default function Auth() {
   const handleRegister = async (data: RegisterFormData) => {
     setLoading({
       loading: true,
-      title: "Creating account",
-      description: "We are creating your account...",
+      title: t("auth.creatingAccount"),
+      description: t("auth.creatingAccountDesc"),
     });
     setError(null);
 
@@ -140,44 +272,45 @@ export default function Auth() {
       await saveName({ name: data.name });
       setLoading({
         loading: true,
-        title: "Account created",
-        description: "Your account has been created successfully",
+        title: t("auth.accountCreated"),
+        description: t("auth.accountCreatedDesc"),
         state: "success",
       });
       router.push("/");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("errors.generic"));
       setLoading({
         loading: false,
-        title: "Error creating account",
-        description: "An error occurred while creating your account",
+        title: t("auth.errorCreatingAccount"),
+        description: t("auth.errorCreatingAccountDesc"),
         state: "error",
       });
     }
   };
 
   const handleSocialLogin = async (provider: "github" | "google") => {
+    const providerName =
+      provider === "github" ? t("auth.github") : t("auth.google");
     setLoading({
       loading: true,
-      title: `Signing in with ${provider === "github" ? "GitHub" : "Google"}`,
-      description: "Redirecting to authentication...",
+      title: `${t("auth.signingInWith")} ${providerName}`,
+      description: t("auth.redirectingToAuth"),
     });
     setError(null);
 
     try {
       await signIn(provider);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("errors.generic"));
       setLoading({
         loading: false,
-        title: "Error signing in",
-        description: `An error occurred while signing in with ${provider === "github" ? "GitHub" : "Google"}`,
+        title: t("auth.errorSigningIn"),
+        description: `${t("auth.errorSigningInWith")} ${providerName}`,
         state: "error",
       });
     }
   };
 
-  // Animation variants for staggered effects
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -243,7 +376,7 @@ export default function Auth() {
 
   return (
     <LayoutGroup>
-      <div className="flex h-[calc(100vh-64px)] w-full bg-background-dim">
+      <div className="flex min-h-screen w-full bg-background-dim">
         {/* Branding Panel - Animates position based on active tab */}
         <motion.div
           layout
@@ -318,8 +451,8 @@ export default function Auth() {
                   transition={{ delay: 0.4, duration: 0.5 }}
                 >
                   {activeTab === "login"
-                    ? "Welcome back to Athena"
-                    : "Start your journey with Athena"}
+                    ? t("auth.welcomeBack")
+                    : t("auth.startJourney")}
                 </motion.h2>
                 <motion.p
                   className="text-xl text-white/90 leading-relaxed"
@@ -328,8 +461,8 @@ export default function Auth() {
                   transition={{ delay: 0.5, duration: 0.5 }}
                 >
                   {activeTab === "login"
-                    ? "Your all-in-one platform for creating powerful, scalable applications with real-time data."
-                    : "Join thousands of developers building the next generation of applications."}
+                    ? t("auth.welcomeBackSubtitle")
+                    : t("auth.startJourneySubtitle")}
                 </motion.p>
               </motion.div>
               <motion.div
@@ -352,9 +485,11 @@ export default function Auth() {
                         <Zap className="w-4 h-4" />
                       </motion.div>
                       <div>
-                        <h3 className="font-semibold mb-1">Lightning Fast</h3>
+                        <h3 className="font-semibold mb-1">
+                          {t("auth.feature1Title")}
+                        </h3>
                         <p className="text-white/80 text-sm">
-                          Built for performance and speed
+                          {t("auth.feature1Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -370,10 +505,10 @@ export default function Auth() {
                       </motion.div>
                       <div>
                         <h3 className="font-semibold mb-1">
-                          Secure by Default
+                          {t("auth.feature2Title")}
                         </h3>
                         <p className="text-white/80 text-sm">
-                          Enterprise-grade security built in
+                          {t("auth.feature2Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -388,9 +523,11 @@ export default function Auth() {
                         <Zap className="w-4 h-4" />
                       </motion.div>
                       <div>
-                        <h3 className="font-semibold mb-1">Scale with Ease</h3>
+                        <h3 className="font-semibold mb-1">
+                          {t("auth.feature3Title")}
+                        </h3>
                         <p className="text-white/80 text-sm">
-                          Grow from prototype to production
+                          {t("auth.feature3Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -408,9 +545,11 @@ export default function Auth() {
                         <CheckCircle2 className="w-4 h-4" />
                       </motion.div>
                       <div>
-                        <h3 className="font-semibold mb-1">Free to Start</h3>
+                        <h3 className="font-semibold mb-1">
+                          {t("auth.registerFeature1Title")}
+                        </h3>
                         <p className="text-white/80 text-sm">
-                          No credit card required to get started
+                          {t("auth.registerFeature1Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -426,10 +565,10 @@ export default function Auth() {
                       </motion.div>
                       <div>
                         <h3 className="font-semibold mb-1">
-                          Deploy in Minutes
+                          {t("auth.registerFeature2Title")}
                         </h3>
                         <p className="text-white/80 text-sm">
-                          From idea to production in record time
+                          {t("auth.registerFeature2Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -444,9 +583,11 @@ export default function Auth() {
                         <CheckCircle2 className="w-4 h-4" />
                       </motion.div>
                       <div>
-                        <h3 className="font-semibold mb-1">24/7 Support</h3>
+                        <h3 className="font-semibold mb-1">
+                          {t("auth.registerFeature3Title")}
+                        </h3>
                         <p className="text-white/80 text-sm">
-                          Our team is here to help you succeed
+                          {t("auth.registerFeature3Desc")}
                         </p>
                       </div>
                     </motion.div>
@@ -531,7 +672,7 @@ export default function Auth() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
                   >
-                    Athena
+                    {t("config.appName")}
                   </motion.span>
                 </div>
               </motion.div>
@@ -555,13 +696,13 @@ export default function Auth() {
                         value="login"
                         className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
                       >
-                        Sign In
+                        {t("auth.signIn")}
                       </TabsTrigger>
                       <TabsTrigger
                         value="register"
                         className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md transition-all"
                       >
-                        Sign Up
+                        {t("auth.signUp")}
                       </TabsTrigger>
                     </TabsList>
                   </motion.div>
@@ -576,10 +717,10 @@ export default function Auth() {
                         transition={{ delay: 0.3, duration: 0.4 }}
                       >
                         <h2 className="text-2xl font-bold text-foreground mb-1">
-                          Welcome back
+                          {t("auth.welcomeBackTitle")}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          Sign in to your account to continue
+                          {t("auth.welcomeBackDesc")}
                         </p>
                       </motion.div>
 
@@ -588,54 +729,32 @@ export default function Auth() {
                         className="space-y-5"
                       >
                         {/* Email Input */}
-                        <motion.div
+                        <FormField
                           custom={0}
+                          label={t("auth.emailLabel")}
+                          id="login-email"
+                          type="email"
+                          autoComplete="email"
+                          placeholder={t("auth.emailPlaceholder")}
+                          icon={Mail}
+                          error={loginErrors.email?.message}
+                          register={registerLogin("email")}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <label
-                            htmlFor="login-email"
-                            className="block text-sm font-medium text-foreground mb-2"
-                          >
-                            Email address
-                          </label>
-                          <Input
-                            id="login-email"
-                            type="email"
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            icon={{ name: Mail, position: "left" }}
-                            error={loginErrors.email?.message}
-                            aria-invalid={!!loginErrors.email}
-                            {...registerLogin("email")}
-                          />
-                        </motion.div>
+                        />
 
                         {/* Password Input */}
-                        <motion.div
+                        <FormField
                           custom={1}
+                          label={t("auth.passwordLabel")}
+                          id="login-password"
+                          type="password"
+                          autoComplete="current-password"
+                          placeholder={t("auth.passwordPlaceholder")}
+                          icon={Lock}
+                          error={loginErrors.password?.message}
+                          register={registerLogin("password")}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <label
-                            htmlFor="login-password"
-                            className="block text-sm font-medium text-foreground mb-2"
-                          >
-                            Password
-                          </label>
-                          <Input
-                            id="login-password"
-                            type="password"
-                            autoComplete="current-password"
-                            placeholder="Enter your password"
-                            icon={{ name: Lock, position: "left" }}
-                            error={loginErrors.password?.message}
-                            aria-invalid={!!loginErrors.password}
-                            {...registerLogin("password")}
-                          />
-                        </motion.div>
+                        />
 
                         {/* Error Message */}
                         <AnimatePresence>
@@ -660,34 +779,16 @@ export default function Auth() {
                         </AnimatePresence>
 
                         {/* Submit Button */}
-                        <motion.button
-                          custom={2}
-                          variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          type="submit"
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                        >
-                          Sign in
-                        </motion.button>
+                        <SubmitButton custom={2} variants={formFieldVariants}>
+                          {t("auth.signIn")}
+                        </SubmitButton>
 
                         {/* Divider */}
-                        <motion.div
+                        <FormDivider
                           custom={3}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                          className="relative flex items-center justify-center"
-                        >
-                          <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border" />
-                          </div>
-                          <div className="relative px-4 text-sm text-muted-foreground bg-card">
-                            Or continue with
-                          </div>
-                        </motion.div>
+                          text={t("auth.orContinueWith")}
+                        />
 
                         {/* Social Login Buttons */}
                         <motion.div
@@ -697,47 +798,41 @@ export default function Auth() {
                           animate="visible"
                           className="grid grid-cols-2 gap-3"
                         >
-                          <motion.button
-                            type="button"
+                          <SocialButton
                             onClick={() => handleSocialLogin("github")}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center justify-center gap-2 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium text-sm"
+                            icon={<Github className="h-5 w-5" />}
                           >
-                            <Github className="h-5 w-5" />
-                            GitHub
-                          </motion.button>
-                          <motion.button
-                            type="button"
+                            {t("auth.github")}
+                          </SocialButton>
+                          <SocialButton
                             onClick={() => handleSocialLogin("google")}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center justify-center gap-2 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium text-sm"
+                            icon={
+                              <svg
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
+                                <path
+                                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                  fill="#4285F4"
+                                />
+                                <path
+                                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                  fill="#34A853"
+                                />
+                                <path
+                                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                  fill="#FBBC05"
+                                />
+                                <path
+                                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                  fill="#EA4335"
+                                />
+                              </svg>
+                            }
                           >
-                            <svg
-                              className="h-5 w-5"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                            >
-                              <path
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                fill="#4285F4"
-                              />
-                              <path
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                fill="#34A853"
-                              />
-                              <path
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                fill="#FBBC05"
-                              />
-                              <path
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                fill="#EA4335"
-                              />
-                            </svg>
-                            Google
-                          </motion.button>
+                            {t("auth.google")}
+                          </SocialButton>
                         </motion.div>
                       </form>
                     </div>
@@ -753,10 +848,10 @@ export default function Auth() {
                         transition={{ delay: 0.3, duration: 0.4 }}
                       >
                         <h2 className="text-2xl font-bold text-foreground mb-1">
-                          Create your account
+                          {t("auth.createAccountTitle")}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          Get started with Athena today
+                          {t("auth.createAccountDesc")}
                         </p>
                       </motion.div>
 
@@ -765,79 +860,46 @@ export default function Auth() {
                         className="space-y-5"
                       >
                         {/* Name Input */}
-                        <motion.div
+                        <FormField
                           custom={0}
+                          label={t("auth.fullNameLabel")}
+                          id="register-name"
+                          type="text"
+                          autoComplete="name"
+                          placeholder={t("auth.fullNamePlaceholder")}
+                          icon={User}
+                          error={registerErrors.name?.message}
+                          register={registerRegister("name")}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <label
-                            htmlFor="register-name"
-                            className="block text-sm font-medium text-foreground mb-2"
-                          >
-                            Full name
-                          </label>
-                          <Input
-                            id="register-name"
-                            type="text"
-                            autoComplete="name"
-                            placeholder="John Doe"
-                            icon={{ name: User, position: "left" }}
-                            error={registerErrors.name?.message}
-                            aria-invalid={!!registerErrors.name}
-                            {...registerRegister("name")}
-                          />
-                        </motion.div>
+                        />
 
                         {/* Email Input */}
-                        <motion.div
+                        <FormField
                           custom={1}
+                          label={t("auth.emailLabel")}
+                          id="register-email"
+                          type="email"
+                          autoComplete="email"
+                          placeholder={t("auth.emailPlaceholder")}
+                          icon={Mail}
+                          error={registerErrors.email?.message}
+                          register={registerRegister("email")}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <label
-                            htmlFor="register-email"
-                            className="block text-sm font-medium text-foreground mb-2"
-                          >
-                            Email address
-                          </label>
-                          <Input
-                            id="register-email"
-                            type="email"
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            icon={{ name: Mail, position: "left" }}
-                            error={registerErrors.email?.message}
-                            aria-invalid={!!registerErrors.email}
-                            {...registerRegister("email")}
-                          />
-                        </motion.div>
+                        />
 
                         {/* Password Input */}
-                        <motion.div
+                        <FormField
                           custom={2}
+                          label={t("auth.passwordLabel")}
+                          id="register-password"
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder={t("auth.passwordPlaceholderNew")}
+                          icon={Lock}
+                          error={registerErrors.password?.message}
+                          register={registerRegister("password")}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <label
-                            htmlFor="register-password"
-                            className="block text-sm font-medium text-foreground mb-2"
-                          >
-                            Password
-                          </label>
-                          <Input
-                            id="register-password"
-                            type="password"
-                            autoComplete="new-password"
-                            placeholder="At least 8 characters"
-                            icon={{ name: Lock, position: "left" }}
-                            error={registerErrors.password?.message}
-                            aria-invalid={!!registerErrors.password}
-                            {...registerRegister("password")}
-                          />
-                        </motion.div>
+                        />
 
                         {/* Error Message */}
                         <AnimatePresence>
@@ -862,34 +924,16 @@ export default function Auth() {
                         </AnimatePresence>
 
                         {/* Submit Button */}
-                        <motion.button
-                          custom={3}
-                          variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          type="submit"
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                        >
-                          Create account
-                        </motion.button>
+                        <SubmitButton custom={3} variants={formFieldVariants}>
+                          {t("auth.signUp")}
+                        </SubmitButton>
 
                         {/* Divider */}
-                        <motion.div
+                        <FormDivider
                           custom={4}
                           variants={formFieldVariants}
-                          initial="hidden"
-                          animate="visible"
-                          className="relative flex items-center justify-center"
-                        >
-                          <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border" />
-                          </div>
-                          <div className="relative px-4 text-sm text-muted-foreground bg-card">
-                            Or continue with
-                          </div>
-                        </motion.div>
+                          text={t("auth.orContinueWith")}
+                        />
 
                         {/* Social Login Buttons */}
                         <motion.div
@@ -899,47 +943,41 @@ export default function Auth() {
                           animate="visible"
                           className="grid grid-cols-2 gap-3"
                         >
-                          <motion.button
-                            type="button"
+                          <SocialButton
                             onClick={() => handleSocialLogin("github")}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center justify-center gap-2 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium text-sm"
+                            icon={<Github className="h-5 w-5" />}
                           >
-                            <Github className="h-5 w-5" />
-                            GitHub
-                          </motion.button>
-                          <motion.button
-                            type="button"
+                            {t("auth.github")}
+                          </SocialButton>
+                          <SocialButton
                             onClick={() => handleSocialLogin("google")}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center justify-center gap-2 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium text-sm"
+                            icon={
+                              <svg
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
+                                <path
+                                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                  fill="#4285F4"
+                                />
+                                <path
+                                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                  fill="#34A853"
+                                />
+                                <path
+                                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                  fill="#FBBC05"
+                                />
+                                <path
+                                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                  fill="#EA4335"
+                                />
+                              </svg>
+                            }
                           >
-                            <svg
-                              className="h-5 w-5"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                            >
-                              <path
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                fill="#4285F4"
-                              />
-                              <path
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                fill="#34A853"
-                              />
-                              <path
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                fill="#FBBC05"
-                              />
-                              <path
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                fill="#EA4335"
-                              />
-                            </svg>
-                            Google
-                          </motion.button>
+                            {t("auth.google")}
+                          </SocialButton>
                         </motion.div>
 
                         {/* Terms */}
@@ -950,19 +988,19 @@ export default function Auth() {
                           initial="hidden"
                           animate="visible"
                         >
-                          By signing up, you agree to our{" "}
+                          {t("auth.termsPrefix")}{" "}
                           <a
                             href="#"
                             className="text-primary hover:text-primary/80"
                           >
-                            Terms of Service
+                            {t("auth.termsOfService")}
                           </a>{" "}
-                          and{" "}
+                          {t("auth.and")}{" "}
                           <a
                             href="#"
                             className="text-primary hover:text-primary/80"
                           >
-                            Privacy Policy
+                            {t("auth.privacyPolicy")}
                           </a>
                         </motion.p>
                       </form>

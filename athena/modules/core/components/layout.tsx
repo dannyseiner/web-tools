@@ -2,20 +2,9 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  Home,
-  Settings,
-  BarChart3,
-  MessageSquare,
-  ChevronLeft,
-  ChevronRight,
-  Zap,
-  Building2,
-  CodeXml,
-  Book,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LucideIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/modules/core/ui/avatar";
-import { Button } from "@/modules/core/ui/button";
+import { Button, buttonVariants } from "@/modules/core/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -26,26 +15,34 @@ import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { getInitials } from "../lib/format";
+import { VariantProps } from "class-variance-authority";
+import { Logo } from "./logo";
 
-const navItems = [
-  { icon: Home, label: "Dashboard", href: "/" },
-  { icon: Building2, label: "Organizations", href: "/organizations" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: MessageSquare, label: "Messages", href: "/messages" },
-  { icon: CodeXml, label: "Docs", href: "/docs" },
-  { icon: Settings, label: "Settings", href: "/settings" },
-];
+export type NavButtonType = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants>;
 
-export const MainLayout = ({ children }: { children: React.ReactNode }) => {
+export type Link = {
+  render?: (link: Link) => React.ReactNode;
+  icon: LucideIcon;
+  label: string;
+  href: string;
+  disabled?: boolean;
+};
+
+export type LayoutProps = {
+  links: Link[];
+  children: React.ReactNode;
+  navbarButtonMenus: NavButtonType[];
+};
+
+export const Layout = ({ links, children, navbarButtonMenus }: LayoutProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
   const profile = useQuery(api.profile.getProfile);
 
-  // Hide layout for auth page
   const isAuthPage = pathname === "/auth";
 
-  // If on auth page, just render children without layout
   if (isAuthPage) {
     return <div className="h-screen w-full">{children}</div>;
   }
@@ -60,30 +57,18 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border">
-          {isExpanded ? (
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-linear-to-br from-primary to-orange-600 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-semibold text-lg text-foreground">
-                Athena
-              </span>
-            </div>
-          ) : (
-            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-primary to-orange-600 flex items-center justify-center mx-auto">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-          )}
+          {isExpanded ? <Logo text={true} /> : <Logo text={false} />}
         </div>
 
         {/* Navigation Items */}
         <nav className="flex-1 py-4 px-2 overflow-y-auto">
           <TooltipProvider delayDuration={0}>
             <ul className="space-y-1">
-              {navItems.map((item) => {
+              {links.map((item, idx) => {
                 const isActive = pathname === item.href;
+                if (item.render) return item.render(item);
                 return (
-                  <li key={item.href} className="relative">
+                  <li key={idx} className="relative">
                     {isActive && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full" />
                     )}
@@ -238,21 +223,11 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <div className="w-px h-6 bg-border" />
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-border hover:bg-secondary"
-            >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Support
-            </Button>
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Book className="mr-2 h-4 w-4" />
-              Docs
-            </Button>
+            {navbarButtonMenus.map((menu, idx) => (
+              <Button key={idx} size="sm" {...menu}>
+                {menu.children}
+              </Button>
+            ))}
           </div>
         </header>
 
@@ -264,13 +239,3 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
     </div>
   );
 };
-
-export function exportWithMainLayout(Page: React.ComponentType) {
-  return function WrappedPage() {
-    return (
-      <MainLayout>
-        <Page />
-      </MainLayout>
-    );
-  };
-}

@@ -1,54 +1,68 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Building2, FileText, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
+import { exportWithMainLayout } from "@/modules/core/layouts/main-layout";
+import {
+  Building2,
+  ArrowLeft,
+  Image as ImageIcon,
+  Loader2,
+  CheckCircle2,
+} from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/modules/core/ui/input";
-import { motion } from "motion/react";
 import { useLoader } from "@/modules/core/hooks/use-loader";
-import { FileUpload, UploadedFile } from "@/modules/core/ui/file-upload";
+import { useTranslations } from "next-intl";
 
-// Zod schema for organization validation
-const organizationSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Organization name is required")
-    .min(2, "Organization name must be at least 2 characters")
-    .max(100, "Organization name must be less than 100 characters"),
-  description: z
-    .string()
-    .max(500, "Description must be less than 500 characters")
-    .optional()
-    .or(z.literal("")),
-});
+type CreateOrgFormData = {
+  name: string;
+  description?: string;
+  image?: string;
+};
 
-type OrganizationFormData = z.infer<typeof organizationSchema>;
-
-export default function CreateOrganization() {
+function CreateOrganizationPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [logoFiles, setLogoFiles] = useState<UploadedFile[]>([]);
   const createOrganization = useMutation(api.organizations.createOrganization);
   const { setLoading } = useLoader();
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const t = useTranslations();
+  
+  const createOrgSchema = z.object({
+    name: z
+      .string()
+      .min(1, t('pages.organizationsCreate.validation.nameRequired'))
+      .min(3, t('pages.organizationsCreate.validation.nameMinLength'))
+      .max(50, t('pages.organizationsCreate.validation.nameMaxLength')),
+    description: z
+      .string()
+      .max(200, t('pages.organizationsCreate.validation.descMaxLength'))
+      .optional(),
+    image: z.string().url(t('pages.organizationsCreate.validation.imageInvalid')).optional().or(z.literal("")),
+  });
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
-  } = useForm<OrganizationFormData>({
-    resolver: zodResolver(organizationSchema),
+  } = useForm<CreateOrgFormData>({
+    resolver: zodResolver(createOrgSchema),
   });
 
-  const onSubmit = async (data: OrganizationFormData) => {
+  const imageUrl = watch("image");
+
+  const onSubmit = async (data: CreateOrgFormData) => {
     setLoading({
       loading: true,
-      title: "Creating organization",
-      description: "Setting up your organization...",
+      title: t('pages.organizationsCreate.creatingOrg'),
+      description: t('pages.organizationsCreate.creatingOrgDesc'),
     });
     setError(null);
 
@@ -56,43 +70,39 @@ export default function CreateOrganization() {
       const result = await createOrganization({
         name: data.name,
         description: data.description || undefined,
-        image: logoFiles.length > 0 ? logoFiles[0].base64 : undefined,
+        image: data.image || undefined,
       });
 
+      setIsSuccess(true);
       setLoading({
         loading: true,
-        title: "Organization created",
-        description: "Your organization has been created successfully",
+        title: t('pages.organizationsCreate.orgCreated'),
+        description: t('pages.organizationsCreate.orgCreatedDesc'),
         state: "success",
       });
 
-      // Redirect to organization page
-      router.push(`/organizations/${result.organizationId}`);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to create organization";
-      setError(errorMessage);
+      // Redirect to the new organization page after a short delay
+      setTimeout(() => {
+        router.push(`/organizations/${result.organizationId}`);
+      }, 1500);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : t('pages.organizationsCreate.failedToCreate'));
       setLoading({
         loading: false,
-        title: "Error creating organization",
-        description: errorMessage,
+        title: t('pages.organizationsCreate.errorCreatingOrg'),
+        description: error instanceof Error ? error.message : t('errors.unknownError'),
         state: "error",
       });
     }
   };
 
   const formFieldVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      scale: 0.95,
-    },
+    hidden: { opacity: 0, y: 20 },
     visible: (custom: number) => ({
       opacity: 1,
       y: 0,
-      scale: 1,
       transition: {
-        type: "spring" as const,
+        type: "spring",
         stiffness: 100,
         damping: 15,
         delay: custom * 0.1,
@@ -101,30 +111,37 @@ export default function CreateOrganization() {
   };
 
   return (
-    <div className="min-h-screen bg-background-dim flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+      <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => router.push("/organizations")}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          {t('pages.organizationsCreate.backToOrganizations')}
+        </motion.button>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-8"
         >
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg">
-              <Building2 className="w-8 h-8 text-white" />
-            </div>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-orange-600 mb-4 shadow-lg">
+            <Building2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Create New Organization
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            {t('pages.organizationsCreate.title')}
           </h1>
           <p className="text-muted-foreground">
-            Set up a new organization to collaborate with your team
+            {t('pages.organizationsCreate.subtitle')}
           </p>
         </motion.div>
 
@@ -132,8 +149,8 @@ export default function CreateOrganization() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="bg-card rounded-xl shadow-lg border border-border p-8"
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-card border border-border rounded-xl p-8 shadow-lg"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Organization Name */}
@@ -147,17 +164,20 @@ export default function CreateOrganization() {
                 htmlFor="name"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                Organization Name <span className="text-destructive">*</span>
+                {t('pages.organizationsCreate.nameLabel')} <span className="text-destructive">{t('common.required')}</span>
               </label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Acme Corporation"
+                placeholder={t('pages.organizationsCreate.namePlaceholder')}
                 icon={{ name: Building2, position: "left" }}
                 error={errors.name?.message}
                 aria-invalid={!!errors.name}
                 {...register("name")}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('pages.organizationsCreate.nameHint')}
+              </p>
             </motion.div>
 
             {/* Description */}
@@ -171,70 +191,115 @@ export default function CreateOrganization() {
                 htmlFor="description"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                Description{" "}
-                <span className="text-muted-foreground">(Optional)</span>
+                {t('pages.organizationsCreate.descriptionLabel')} <span className="text-muted-foreground">{t('common.optional')}</span>
               </label>
-              <div className="relative">
-                <FileText className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
-                <textarea
-                  id="description"
-                  rows={4}
-                  placeholder="A brief description of your organization..."
-                  className={`w-full pl-10 pr-4 py-3 bg-background border rounded-lg outline-none transition-all placeholder:text-muted-foreground resize-none ${
-                    errors.description
-                      ? "border-destructive ring-destructive/20"
-                      : "border-border focus:border-ring focus:ring-ring/50 focus:ring-[3px]"
-                  }`}
-                  {...register("description")}
-                />
-              </div>
+              <textarea
+                id="description"
+                rows={4}
+                placeholder={t('pages.organizationsCreate.descriptionPlaceholder')}
+                className={`w-full px-4 py-3 bg-background border ${
+                  errors.description
+                    ? "border-destructive focus:ring-destructive"
+                    : "border-border focus:ring-primary"
+                } rounded-lg focus:outline-none focus:ring-2 transition-all resize-none text-foreground placeholder:text-muted-foreground`}
+                {...register("description")}
+              />
               {errors.description && (
-                <p className="mt-1.5 text-sm text-destructive">
+                <p className="text-xs text-destructive mt-1">
                   {errors.description.message}
                 </p>
               )}
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('pages.organizationsCreate.descriptionHint')}
+              </p>
             </motion.div>
 
-            {/* Logo Upload */}
+            {/* Image URL */}
             <motion.div
               custom={2}
               variants={formFieldVariants}
               initial="hidden"
               animate="visible"
             >
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Organization Logo{" "}
-                <span className="text-muted-foreground">(Optional)</span>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
+                {t('pages.organizationsCreate.imageLabel')} <span className="text-muted-foreground">{t('common.optional')}</span>
               </label>
-              <FileUpload
-                accept="image/*"
-                maxSize={5 * 1024 * 1024} // 5MB
-                maxFiles={1}
-                multiple={false}
-                files={logoFiles}
-                onFilesChange={setLogoFiles}
-                label="Upload organization logo"
-                showPreview={true}
-                showSize={true}
+              <Input
+                id="image"
+                type="url"
+                placeholder={t('pages.organizationsCreate.imagePlaceholder')}
+                icon={{ name: ImageIcon, position: "left" }}
+                error={errors.image?.message}
+                aria-invalid={!!errors.image}
+                {...register("image")}
               />
-              <p className="mt-1.5 text-xs text-muted-foreground">
-                Upload a logo for your organization (PNG, JPG, or GIF)
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('pages.organizationsCreate.imageHint')}
               </p>
+
+              {/* Image Preview */}
+              {imageUrl && !errors.image && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 p-4 border border-border rounded-lg bg-background"
+                >
+                  <p className="text-xs font-medium text-foreground mb-2">
+                    {t('pages.organizationsCreate.logoPreview')}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={imageUrl}
+                      alt="Organization logo preview"
+                      className="w-16 h-16 rounded-xl object-cover border border-border shadow-sm bg-white"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      {t('pages.organizationsCreate.logoPreviewHint')}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-destructive/10 border border-destructive/30 rounded-lg p-4"
-              >
-                <p className="text-sm text-destructive">{error}</p>
-              </motion.div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 flex items-start gap-3"
+                >
+                  <div className="text-sm text-destructive">{error}</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Action Buttons */}
+            {/* Success Message */}
+            <AnimatePresence>
+              {isSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex items-center gap-3"
+                >
+                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                  <div className="text-sm text-green-600">
+                    {t('pages.organizationsCreate.successMessage')}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Submit Button */}
             <motion.div
               custom={3}
               variants={formFieldVariants}
@@ -244,59 +309,66 @@ export default function CreateOrganization() {
             >
               <motion.button
                 type="button"
-                onClick={() => router.back()}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 py-3 px-4 border border-border rounded-lg bg-card hover:bg-accent transition-colors font-medium"
+                onClick={() => router.push("/organizations")}
+                disabled={isSubmitting || isSuccess}
+                className="flex-1 bg-background hover:bg-accent text-foreground font-semibold py-3 rounded-lg border border-border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t('common.cancel')}
               </motion.button>
+
               <motion.button
                 type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={isSubmitting || isSuccess}
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Creating...
+                    {t('pages.organizationsCreate.creating')}
                   </>
                 ) : (
-                  "Create Organization"
+                  <>
+                    <Building2 className="h-5 w-5" />
+                    {t('pages.organizations.createOrganization')}
+                  </>
                 )}
               </motion.button>
             </motion.div>
           </form>
         </motion.div>
 
-        {/* Info Card */}
+        {/* Info Box */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-6 bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-8 bg-primary/5 border border-primary/10 rounded-xl p-6"
         >
-          <h3 className="text-sm font-semibold text-foreground mb-3">
-            What happens next?
+          <h3 className="text-sm font-semibold text-foreground mb-2">
+            {t('pages.organizationsCreate.whatHappensNext')}
           </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>You will be assigned as the organization admin</span>
+              <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <span>{t('pages.organizationsCreate.step1')}</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>You can invite team members to join</span>
+              <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <span>{t('pages.organizationsCreate.step2')}</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>Manage roles and permissions for your team</span>
+              <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <span>{t('pages.organizationsCreate.step3')}</span>
             </li>
           </ul>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }
+
+export default exportWithMainLayout(CreateOrganizationPage);

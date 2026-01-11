@@ -6,7 +6,6 @@ import { api } from "@/convex/_generated/api";
 import { motion, AnimatePresence } from "motion/react";
 import {
   User,
-  Building2,
   Settings,
   Shield,
   Activity,
@@ -24,71 +23,67 @@ import { useRouter } from "next/navigation";
 import { getInitials } from "@/modules/core/lib/format";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useLoader } from "@/modules/core/hooks/use-loader";
-import {
-  UserOrganization,
-  UserOrganizations,
-  UserProfile,
-} from "@/lib/convex-types";
+import { exportWithMainLayout } from "@/modules/core/layouts/main-layout";
+import { useTranslations } from "next-intl";
+import { UserProfile } from "@/lib/convex-types";
+import { TFunction } from "@/lib/i18n";
 
-type TabType =
-  | "organizations"
-  | "settings"
-  | "security"
-  | "activity"
-  | "logout";
+type TabType = "profile" | "settings" | "security" | "activity";
 
-export default function ProfilePage() {
+function ProfilePage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabType>("organizations");
+  const [activeTab, setActiveTab] = useState<TabType>("profile");
   const { signOut } = useAuthActions();
   const profile = useQuery(api.profile.getProfile);
-  const organizations = useQuery(api.organizations.getUserOrganizations);
   const { setLoading } = useLoader();
+  const t = useTranslations();
 
-  const handleTabChange = async (tab: TabType) => {
-    if (tab === "logout") {
-      setLoading({
-        loading: true,
-        title: "Signing out...",
-      });
+  const handleSignOut = async () => {
+    setLoading({
+      loading: true,
+      title: t("pages.profile.signingOut"),
+      description: t("pages.profile.signingOutDesc"),
+    });
+
+    try {
       await signOut();
       setLoading({
-        loading: false,
-        title: "Signed out",
-        description: "You have been signed out successfully",
+        loading: true,
+        title: t("pages.profile.signedOut"),
+        description: t("pages.profile.signedOutDesc"),
         state: "success",
       });
       router.push("/auth");
-    } else {
-      setActiveTab(tab);
+    } catch (error) {
+      setLoading({
+        loading: false,
+        title: t("pages.profile.errorSigningOut"),
+        description: t("pages.profile.errorSigningOutDesc"),
+        state: "error",
+      });
     }
   };
 
   const tabs = [
     {
-      id: "organizations" as TabType,
-      label: "Organizations",
-      icon: Building2,
+      id: "profile" as TabType,
+      label: t("pages.profile.tabs.profile"),
+      icon: User,
     },
     {
       id: "settings" as TabType,
-      label: "Settings",
+      label: t("pages.profile.tabs.settings"),
       icon: Settings,
     },
     {
       id: "security" as TabType,
-      label: "Security",
+      label: t("pages.profile.tabs.security"),
       icon: Shield,
     },
     {
       id: "activity" as TabType,
-      label: "Activity",
+      label: t("pages.profile.tabs.activity"),
       icon: Activity,
-    },
-    {
-      id: "logout" as TabType,
-      label: "Logout",
-      icon: LogOut,
     },
   ];
 
@@ -97,7 +92,9 @@ export default function ProfilePage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">
+            {t("pages.profile.loadingProfile")}
+          </p>
         </div>
       </div>
     );
@@ -111,12 +108,14 @@ export default function ProfilePage() {
             <User className="h-10 w-10 text-destructive" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Not Logged In
+            {t("pages.profile.notLoggedInTitle")}
           </h2>
           <p className="text-muted-foreground mb-6">
-            Please log in to view your profile
+            {t("pages.profile.notLoggedInDesc")}
           </p>
-          <Button onClick={() => router.push("/auth")}>Go to Login</Button>
+          <Button onClick={() => router.push("/auth")}>
+            {t("pages.profile.goToLogin")}
+          </Button>
         </div>
       </div>
     );
@@ -136,7 +135,7 @@ export default function ProfilePage() {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
-          Back
+          {t("common.back")}
         </motion.button>
 
         {/* Profile Header */}
@@ -147,7 +146,7 @@ export default function ProfilePage() {
           className="bg-card border border-border rounded-xl overflow-hidden"
         >
           {/* Cover Image */}
-          <div className="h-32 bg-linear-to-r from-primary via-orange-500 to-pink-500" />
+          <div className="h-32 bg-gradient-to-r from-primary via-orange-500 to-pink-500" />
 
           {/* Profile Info */}
           <div className="px-8 pb-6">
@@ -184,7 +183,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
-                      Joined{" "}
+                      {t("pages.profile.joined")}{" "}
                       {new Date(profile._creationTime).toLocaleDateString()}
                     </span>
                   </div>
@@ -194,9 +193,9 @@ export default function ProfilePage() {
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <Button variant="outline" size="sm">
-                  Share Profile
+                  {t("pages.profile.shareProfile")}
                 </Button>
-                <Button size="sm">Edit Profile</Button>
+                <Button size="sm">{t("pages.profile.editProfile")}</Button>
               </div>
             </div>
           </div>
@@ -218,7 +217,7 @@ export default function ProfilePage() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
+                    onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                       isActive
                         ? "bg-primary text-primary-foreground shadow-md"
@@ -230,6 +229,17 @@ export default function ProfilePage() {
                   </button>
                 );
               })}
+
+              {/* Sign Out Button */}
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:bg-destructive/10 text-destructive border border-destructive/20"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">
+                  {t("pages.profile.tabs.logout")}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -244,12 +254,12 @@ export default function ProfilePage() {
                 transition={{ duration: 0.3 }}
                 className="bg-card border border-border rounded-xl p-6"
               >
-                {activeTab === "organizations" && (
-                  <OrganizationsTab organizations={organizations ?? []} />
+                {activeTab === "profile" && (
+                  <ProfileTab profile={profile} t={t} />
                 )}
-                {activeTab === "settings" && <SettingsTab profile={profile} />}
-                {activeTab === "security" && <SecurityTab />}
-                {activeTab === "activity" && <ActivityTab />}
+                {activeTab === "settings" && <SettingsTab t={t} />}
+                {activeTab === "security" && <SecurityTab t={t} />}
+                {activeTab === "activity" && <ActivityTab t={t} />}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -259,94 +269,26 @@ export default function ProfilePage() {
   );
 }
 
-// Organizations Tab Component
-function OrganizationsTab({
-  organizations,
-}: {
-  organizations: UserOrganizations;
-}) {
+// Profile Tab Component
+function ProfileTab({ profile, t }: { profile: UserProfile; t: TFunction }) {
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          My Organizations
-        </h2>
-        <p className="text-muted-foreground">Organizations youre a member of</p>
-      </div>
-
-      {organizations === undefined ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      ) : organizations.length === 0 ? (
-        <div className="text-center py-12">
-          <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No organizations yet
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            Create or join an organization to get started
-          </p>
-          <Button>Create Organization</Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {organizations.map((org: UserOrganization) => (
-            <motion.div
-              key={org._id}
-              whileHover={{ scale: 1.02 }}
-              className="flex items-center gap-4 p-4 border border-border rounded-lg hover:shadow-md transition-all cursor-pointer"
-            >
-              {org.image ? (
-                <img
-                  src={org.image}
-                  alt={org.name}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-lg bg-linear-to-br from-primary to-orange-600 flex items-center justify-center">
-                  <Building2 className="h-8 w-8 text-white" />
-                </div>
-              )}
-              <div className="flex-1">
-                <h3 className="font-semibold text-foreground">{org.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {org.description || "No description"}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                    {org.role}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Settings Tab Component
-function SettingsTab({ profile }: { profile: UserProfile }) {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Profile Settings
+          {t("pages.profile.personalInfo")}
         </h2>
         <p className="text-muted-foreground">
-          Update your personal information
+          {t("pages.profile.personalInfoDesc")}
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">
-            Full Name
+            {t("pages.profile.fullName")}
           </label>
           <Input
-            placeholder="Enter your name"
+            placeholder={t("pages.profile.enterName")}
             defaultValue={profile.name || ""}
             icon={{ name: User, position: "left" }}
           />
@@ -354,22 +296,72 @@ function SettingsTab({ profile }: { profile: UserProfile }) {
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">
-            Email Address
+            {t("pages.profile.emailAddress")}
           </label>
           <Input
             type="email"
-            placeholder="Enter your email"
+            placeholder={t("pages.profile.enterEmail")}
             defaultValue={profile.email || ""}
             icon={{ name: Mail, position: "left" }}
             disabled
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Email cannot be changed
+            {t("pages.profile.emailCannotChange")}
           </p>
         </div>
 
         <div className="pt-4">
-          <Button>Save Changes</Button>
+          <Button>{t("common.saveChanges")}</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Settings Tab Component
+function SettingsTab({ t }: { t: TFunction }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          {t("pages.profile.preferences")}
+        </h2>
+        <p className="text-muted-foreground">
+          {t("pages.profile.preferencesDesc")}
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="p-4 border border-border rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">
+                {t("pages.profile.notifications")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("pages.profile.notificationsDesc")}
+              </p>
+            </div>
+            <Button variant="outline" size="sm">
+              {t("common.configure")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="p-4 border border-border rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">
+                {t("pages.profile.language")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("pages.profile.languageDesc")}
+              </p>
+            </div>
+            <Button variant="outline" size="sm">
+              {t("common.change")}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -377,15 +369,15 @@ function SettingsTab({ profile }: { profile: UserProfile }) {
 }
 
 // Security Tab Component
-function SecurityTab() {
+function SecurityTab({ t }: { t: TFunction }) {
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Security Settings
+          {t("pages.profile.securitySettings")}
         </h2>
         <p className="text-muted-foreground">
-          Manage your account security and privacy
+          {t("pages.profile.securitySettingsDesc")}
         </p>
       </div>
 
@@ -395,14 +387,16 @@ function SecurityTab() {
             <div className="flex items-start gap-3">
               <Shield className="h-5 w-5 text-primary mt-1" />
               <div>
-                <h3 className="font-semibold text-foreground">Password</h3>
+                <h3 className="font-semibold text-foreground">
+                  {t("pages.profile.password")}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Last changed 30 days ago
+                  {t("pages.profile.passwordDesc")}
                 </p>
               </div>
             </div>
             <Button variant="outline" size="sm">
-              Change
+              {t("common.change")}
             </Button>
           </div>
         </div>
@@ -413,15 +407,15 @@ function SecurityTab() {
               <Shield className="h-5 w-5 text-primary mt-1" />
               <div>
                 <h3 className="font-semibold text-foreground">
-                  Two-Factor Authentication
+                  {t("pages.profile.twoFactor")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Add an extra layer of security
+                  {t("pages.profile.twoFactorDesc")}
                 </p>
               </div>
             </div>
             <Button variant="outline" size="sm">
-              Enable
+              {t("common.enable")}
             </Button>
           </div>
         </div>
@@ -432,15 +426,15 @@ function SecurityTab() {
               <Shield className="h-5 w-5 text-primary mt-1" />
               <div>
                 <h3 className="font-semibold text-foreground">
-                  Active Sessions
+                  {t("pages.profile.activeSessions")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Manage your active sessions
+                  {t("pages.profile.activeSessionsDesc")}
                 </p>
               </div>
             </div>
             <Button variant="outline" size="sm">
-              View All
+              {t("common.viewAll")}
             </Button>
           </div>
         </div>
@@ -450,31 +444,31 @@ function SecurityTab() {
 }
 
 // Activity Tab Component
-function ActivityTab() {
+function ActivityTab({ t }: { t: TFunction }) {
   const activities = [
     {
       id: 1,
-      action: "Created organization",
-      details: "Acme Corporation",
-      time: "2 hours ago",
+      action: t("pages.profile.activities.signedIn"),
+      details: t("pages.profile.activities.signedInDetails"),
+      time: t("pages.profile.timeAgo.hoursAgo", { hours: 2 }),
     },
     {
       id: 2,
-      action: "Updated profile",
-      details: "Changed profile picture",
-      time: "1 day ago",
+      action: t("pages.profile.activities.updatedProfile"),
+      details: t("pages.profile.activities.updatedProfileDetails"),
+      time: t("pages.profile.timeAgo.dayAgo"),
     },
     {
       id: 3,
-      action: "Joined organization",
-      details: "Tech Startups Inc",
-      time: "3 days ago",
+      action: t("pages.profile.activities.createdOrganization"),
+      details: t("pages.profile.activities.createdOrgDetails"),
+      time: t("pages.profile.timeAgo.daysAgo", { days: 3 }),
     },
     {
       id: 4,
-      action: "Changed password",
-      details: "Security update",
-      time: "1 week ago",
+      action: t("pages.profile.activities.changedPassword"),
+      details: t("pages.profile.activities.changedPasswordDetails"),
+      time: t("pages.profile.timeAgo.weekAgo"),
     },
   ];
 
@@ -482,9 +476,11 @@ function ActivityTab() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Recent Activity
+          {t("pages.profile.recentActivity")}
         </h2>
-        <p className="text-muted-foreground">Your recent actions and updates</p>
+        <p className="text-muted-foreground">
+          {t("pages.profile.recentActivityDesc")}
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -514,3 +510,5 @@ function ActivityTab() {
     </div>
   );
 }
+
+export default exportWithMainLayout(ProfilePage);

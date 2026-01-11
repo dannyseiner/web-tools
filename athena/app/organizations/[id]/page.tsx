@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
+import { exportWithOrganizationLayout } from "@/modules/core/layouts/organization-layout";
 import { useParams, useRouter } from "next/navigation";
 import {
   Building2,
@@ -13,9 +14,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { Id } from "../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
-export default function OrganizationDetailPage() {
+function OrganizationDetailPage() {
   const params = useParams();
   const router = useRouter();
   const organizationId = params.id as Id<"organizations">;
@@ -78,7 +79,7 @@ export default function OrganizationDetailPage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push("/organization")}
+            onClick={() => router.push("/organizations")}
             className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -98,7 +99,7 @@ export default function OrganizationDetailPage() {
         transition={{ duration: 0.3 }}
         whileHover={{ scale: 1.05, x: -5 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => router.push("/organization")}
+        onClick={() => router.push("/organizations")}
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-5 w-5" />
@@ -273,3 +274,5 @@ export default function OrganizationDetailPage() {
     </div>
   );
 }
+
+export default exportWithOrganizationLayout(OrganizationDetailPage);
