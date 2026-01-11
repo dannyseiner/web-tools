@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import {
   Layout,
-  NavLink,
-  NavbarButton,
+  Link as NavLink,
+  NavButtonType,
 } from "@/modules/core/components/layout";
 import { useParams } from "next/navigation";
 
@@ -55,11 +55,16 @@ const getProjectNavLinks = (orgId: string, projectId: string): NavLink[] => [
   },
 ];
 
-const navbarButtons: NavbarButton[] = [
+const navbarButtonMenus: NavButtonType[] = [
   {
-    icon: MessageSquare,
-    label: "Support",
+    children: (
+      <>
+        <MessageSquare className="mr-2 h-4 w-4" />
+        Support
+      </>
+    ),
     variant: "outline",
+    className: "border-border hover:bg-secondary",
   },
 ];
 
@@ -71,8 +76,7 @@ export const ProjectLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout
       links={getProjectNavLinks(orgId || "default", projectId || "default")}
-      navbarButtons={navbarButtons}
-      headerTitle="Project"
+      navbarButtonMenus={navbarButtonMenus}
     >
       {children}
     </Layout>
