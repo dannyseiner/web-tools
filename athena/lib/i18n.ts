@@ -2,7 +2,7 @@ import { NamespaceKeys, NestedKeyOf, useTranslations } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
 
 export const languages = ["en", "cs"] as const;
-export const fallbackLanguage = "en";
+export const fallbackLanguage = "cs";
 
 export type TFunction<
   NestedKey extends NamespaceKeys<string, NestedKeyOf<string>> = never,
