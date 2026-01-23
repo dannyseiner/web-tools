@@ -14,6 +14,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Skeleton } from "@/modules/core/ui/skeleton";
+import { useTranslations } from "next-intl";
 
 const OrganizationHeaderSkeleton = () => (
   <div className="flex items-center gap-3 px-3 py-2 bg-accent/50 rounded-lg border border-border/50">
@@ -28,9 +29,11 @@ const OrganizationHeaderSkeleton = () => (
 const OrganizationHeader = ({
   name,
   image,
+  overviewLabel,
 }: {
   name?: string | null;
   image?: string | null;
+  overviewLabel: string;
 }) => (
   <div className="flex items-center gap-3 px-3 py-2 bg-accent/50 rounded-lg border border-border/50">
     {image ? (
@@ -50,16 +53,22 @@ const OrganizationHeader = ({
       <p className="font-semibold text-sm text-foreground truncate">
         {name || "Organization"}
       </p>
-      <p className="text-xs text-muted-foreground">Overview</p>
+      <p className="text-xs text-muted-foreground">{overviewLabel}</p>
     </div>
   </div>
 );
 
 const getOrganizationNavLinks = (
   organizationId: string,
-  organizationName?: string | null,
-  organizationImage?: string | null,
-  isLoading?: boolean,
+  organizationName: string | null | undefined,
+  organizationImage: string | null | undefined,
+  isLoading: boolean,
+  labels: {
+    overview: string;
+    projects: string;
+    members: string;
+    settings: string;
+  },
 ): Link[] => [
   {
     icon: Building2,
@@ -69,35 +78,27 @@ const getOrganizationNavLinks = (
       isLoading ? (
         <OrganizationHeaderSkeleton />
       ) : (
-        <OrganizationHeader name={organizationName} image={organizationImage} />
+        <OrganizationHeader
+          name={organizationName}
+          image={organizationImage}
+          overviewLabel={labels.overview}
+        />
       ),
   },
   {
     icon: ListTodo,
-    label: "Projects",
+    label: labels.projects,
     href: `/organizations/${organizationId}/projects`,
   },
   {
     icon: Users,
-    label: "Members",
+    label: labels.members,
     href: `/organizations/${organizationId}/members`,
   },
   {
     icon: Settings,
-    label: "Settings",
+    label: labels.settings,
     href: `/organizations/${organizationId}/settings`,
-  },
-];
-
-const navbarButtonMenus: NavButtonType[] = [
-  {
-    children: (
-      <>
-        <MessageSquare className="mr-2 h-4 w-4" />
-        Support
-      </>
-    ),
-    className: "border-border hover:bg-secondary",
   },
 ];
 
@@ -108,6 +109,7 @@ export const OrganizationLayout = ({
 }) => {
   const params = useParams();
   const organizationId = params?.id as string;
+  const t = useTranslations();
 
   // Fetch organization data
   const organization = useQuery(
@@ -119,6 +121,18 @@ export const OrganizationLayout = ({
 
   const isLoading = organization === undefined;
 
+  const navbarButtonMenus: NavButtonType[] = [
+    {
+      children: (
+        <>
+          <MessageSquare className="mr-2 h-4 w-4" />
+          {t("components.organizationLayout.support")}
+        </>
+      ),
+      className: "border-border hover:bg-secondary",
+    },
+  ];
+
   return (
     <Layout
       links={getOrganizationNavLinks(
@@ -126,6 +140,12 @@ export const OrganizationLayout = ({
         organization?.name ?? null,
         organization?.image ?? null,
         isLoading,
+        {
+          overview: t("components.organizationLayout.overview"),
+          projects: t("components.organizationLayout.projects"),
+          members: t("components.organizationLayout.members"),
+          settings: t("components.organizationLayout.settings"),
+        },
       )}
       navbarButtonMenus={navbarButtonMenus}
     >

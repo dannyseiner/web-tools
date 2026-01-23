@@ -10,11 +10,20 @@
 
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as languages from "../languages.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as organization from "../organization.js";
 import type * as organizations from "../organizations.js";
 import type * as profile from "../profile.js";
+import type * as projectSettings from "../projectSettings.js";
+import type * as projects from "../projects.js";
 import type * as schemes_organization from "../schemes/organization.js";
+import type * as schemes_project from "../schemes/project.js";
+import type * as schemes_projectSettings from "../schemes/projectSettings.js";
+import type * as schemes_translations from "../schemes/translations.js";
+import type * as seed from "../seed.js";
+import type * as translationEditors from "../translationEditors.js";
+import type * as translations from "../translations.js";
 
 import type {
   ApiFromModules,
@@ -25,11 +34,20 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  languages: typeof languages;
   myFunctions: typeof myFunctions;
   organization: typeof organization;
   organizations: typeof organizations;
   profile: typeof profile;
+  projectSettings: typeof projectSettings;
+  projects: typeof projects;
   "schemes/organization": typeof schemes_organization;
+  "schemes/project": typeof schemes_project;
+  "schemes/projectSettings": typeof schemes_projectSettings;
+  "schemes/translations": typeof schemes_translations;
+  seed: typeof seed;
+  translationEditors: typeof translationEditors;
+  translations: typeof translations;
 }>;
 
 /**

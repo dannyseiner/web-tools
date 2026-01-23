@@ -26,21 +26,23 @@ import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { getInitials } from "../lib/format";
-
-const navItems = [
-  { icon: Home, label: "Dashboard", href: "/" },
-  { icon: Building2, label: "Organizations", href: "/organizations" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: MessageSquare, label: "Messages", href: "/messages" },
-  { icon: CodeXml, label: "Docs", href: "/docs" },
-  { icon: Settings, label: "Settings", href: "/settings" },
-];
+import { useTranslations } from "next-intl";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
   const profile = useQuery(api.profile.getProfile);
+  const t = useTranslations();
+
+  const navItems = [
+    { icon: Home, label: t("nav.dashboard"), href: "/" },
+    { icon: Building2, label: t("nav.organizations"), href: "/organizations" },
+    { icon: BarChart3, label: t("nav.analytics"), href: "/analytics" },
+    { icon: MessageSquare, label: t("nav.messages"), href: "/messages" },
+    { icon: CodeXml, label: t("nav.docs"), href: "/docs" },
+    { icon: Settings, label: t("nav.settings"), href: "/settings" },
+  ];
 
   // Hide layout for auth page
   const isAuthPage = pathname === "/auth";
@@ -158,10 +160,10 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       {isExpanded && (
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
-                            Guest
+                            {t("components.user.guest")}
                           </p>
                           <p className="text-xs text-muted-foreground truncate">
-                            Not logged in
+                            {t("components.user.notLoggedIn")}
                           </p>
                         </div>
                       )}
@@ -173,7 +175,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         {profile.image && (
                           <AvatarImage
                             src={profile.image}
-                            alt={profile.name || "User"}
+                            alt={profile.name || t("components.user.user")}
                           />
                         )}
                         <AvatarFallback className="bg-primary text-primary-foreground">
@@ -183,10 +185,10 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       {isExpanded && (
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
-                            {profile.name || "User"}
+                            {profile.name || t("components.user.user")}
                           </p>
                           <p className="text-xs text-muted-foreground truncate">
-                            {profile.email || "No email"}
+                            {profile.email || t("components.user.noEmail")}
                           </p>
                         </div>
                       )}
@@ -197,9 +199,11 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
               {!isExpanded && profile && (
                 <TooltipContent side="right">
                   <div>
-                    <p className="font-medium">{profile.name || "User"}</p>
+                    <p className="font-medium">
+                      {profile.name || t("components.user.user")}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {profile.email || "No email"}
+                      {profile.email || t("components.user.noEmail")}
                     </p>
                   </div>
                 </TooltipContent>
@@ -219,7 +223,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             {isExpanded ? (
               <>
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs">Collapse</span>
+                <span className="text-xs">{t("nav.collapse")}</span>
               </>
             ) : (
               <ChevronRight className="h-4 w-4" />
@@ -233,7 +237,9 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Header */}
         <header className="h-16 bg-white border-b border-border flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+            <h1 className="text-xl font-semibold text-foreground">
+              {t("nav.dashboard")}
+            </h1>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -244,14 +250,14 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
               className="border-border hover:bg-secondary"
             >
               <MessageSquare className="mr-2 h-4 w-4" />
-              Support
+              {t("nav.support")}
             </Button>
             <Button
               size="sm"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Book className="mr-2 h-4 w-4" />
-              Docs
+              {t("nav.docs")}
             </Button>
           </div>
         </header>
