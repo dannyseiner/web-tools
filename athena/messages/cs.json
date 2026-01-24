@@ -357,7 +357,8 @@
       "reports": "Reporty",
       "settings": "Nastavení",
       "translations": "Překlady",
-      "support": "Podpora"
+      "support": "Podpora",
+      "backToOrganization": "Zpět na organizaci"
     },
     "user": {
       "guest": "Host",
@@ -452,6 +453,18 @@
   "errors": {
     "generic": "Došlo k chybě",
     "unknownError": "Došlo k neznámé chybě",
-    "tryAgain": "Zkuste to prosím znovu"
+    "tryAgain": "Zkuste to prosím znovu",
+    "organizationNotFound": "Organizace nenalezena",
+    "organizationNotFoundDesc": "Organizace, kterou hledáte, neexistuje nebo k ní nemáte přístup."
+  },
+  "common": {
+    "cancel": "Zrušit",
+    "save": "Uložit",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "create": "Vytvořit",
+    "search": "Hledat",
+    "filter": "Filtrovat",
+    "backToOrganizations": "Zpět na organizace"
   }
 }

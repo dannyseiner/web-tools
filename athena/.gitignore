@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+athena/.cursor/rules/convex_rules.mdc
+
+
 # testing
 /coverage
 

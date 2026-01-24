@@ -6,6 +6,7 @@ export const projectSettingsTables = {
     projectId: v.id("projects"),
     defaultLanguage: v.optional(v.string()),
     supportedLanguages: v.array(v.string()),
+    apiKey: v.optional(v.string()),
   }).index("by_project", ["projectId"]),
 
   activeTranslationEditors: defineTable({

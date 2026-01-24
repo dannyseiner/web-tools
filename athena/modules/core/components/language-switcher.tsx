@@ -10,7 +10,9 @@ import {
   SelectValue,
 } from "@/modules/core/ui/select";
 
-const languageNames: Record<string, { native: string; english: string }> = {
+export type Language = "en" | "cs";
+
+const languageNames: Record<Language, { native: string; english: string }> = {
   en: { native: "English", english: "English" },
   cs: { native: "Čeština", english: "Czech" },
 };
@@ -30,7 +32,10 @@ export function LanguageSwitcher() {
   return (
     <div className="flex items-center gap-2">
       <Languages className="h-4 w-4 text-muted-foreground" />
-      <Select value={locale} onValueChange={(value) => setLocale(value as any)}>
+      <Select
+        value={locale}
+        onValueChange={(value) => setLocale(value as Language)}
+      >
         <SelectTrigger className="w-[140px]">
           <SelectValue>
             {languageNames[locale]?.native || locale.toUpperCase()}
