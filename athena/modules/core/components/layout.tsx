@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/modules/core/ui/tooltip";
 import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
+import { NotificationBell } from "@/modules/notifications/components/notification-bell";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { getInitials } from "../lib/format";
@@ -33,9 +34,10 @@ export type LayoutProps = {
   links: Link[];
   children: React.ReactNode;
   navbarButtonMenus: NavButtonType[];
+  showNotifications?: boolean;
 };
 
-export const Layout = ({ links, children, navbarButtonMenus }: LayoutProps) => {
+export const Layout = ({ links, children, navbarButtonMenus, showNotifications = true }: LayoutProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
@@ -221,6 +223,8 @@ export const Layout = ({ links, children, navbarButtonMenus }: LayoutProps) => {
             <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell visible={showNotifications} />
+            {showNotifications && <div className="w-px h-6 bg-border" />}
             <LanguageSwitcher />
             <div className="w-px h-6 bg-border" />
             {navbarButtonMenus.map((menu, idx) => (

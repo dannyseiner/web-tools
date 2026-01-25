@@ -23,12 +23,19 @@ import {
   TooltipTrigger,
 } from "@/modules/core/ui/tooltip";
 import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
+import { NotificationBell } from "@/modules/notifications/components/notification-bell";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { getInitials } from "../lib/format";
 import { useTranslations } from "next-intl";
 
-export const MainLayout = ({ children }: { children: React.ReactNode }) => {
+export const MainLayout = ({ 
+  children, 
+  showNotifications = true 
+}: { 
+  children: React.ReactNode;
+  showNotifications?: boolean;
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
@@ -242,6 +249,8 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell visible={showNotifications} />
+            {showNotifications && <div className="w-px h-6 bg-border" />}
             <LanguageSwitcher />
             <div className="w-px h-6 bg-border" />
             <Button

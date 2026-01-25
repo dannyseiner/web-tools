@@ -251,3 +251,107 @@ export const updateOrganization = mutation({
     return null;
   },
 });
+
+export const getOrganizationMembers = query({
+  args: {
+    organizationId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", args.organizationId).eq("userId", userId)
+      )
+      .first();
+
+    if (!membership) return null;
+
+    const members = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId", (q) =>
+        q.eq("organizationId", args.organizationId)
+      )
+      .collect();
+
+    const membersWithDetails = await Promise.all(
+      members.map(async (member) => {
+        const user = await ctx.db.get(member.userId);
+        return {
+          _id: member._id,
+          _creationTime: member._creationTime,
+          role: member.role,
+          user: user
+            ? {
+                _id: user._id,
+                name: user.name ?? "Unknown",
+                email: user.email ?? "No email",
+                image: user.image ?? null,
+              }
+            : null,
+        };
+      })
+    );
+
+    return membersWithDetails.filter((m) => m.user !== null);
+  },
+});
+
+export const updateMemberRole = mutation({
+  args: {
+    memberId: v.id("organizationMembers"),
+    role: v.union(v.literal("Member"), v.literal("Manager"), v.literal("Admin")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
+    const member = await ctx.db.get(args.memberId);
+    if (!member) throw new Error("Member not found");
+
+    const adminMembership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", member.organizationId).eq("userId", userId)
+      )
+      .first();
+
+    if (!adminMembership || adminMembership.role !== "Admin") {
+      throw new Error("Only admins can change member roles");
+    }
+
+    await ctx.db.patch(args.memberId, { role: args.role });
+  },
+});
+
+export const removeMember = mutation({
+  args: {
+    memberId: v.id("organizationMembers"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
+    const member = await ctx.db.get(args.memberId);
+    if (!member) throw new Error("Member not found");
+
+    const adminMembership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", member.organizationId).eq("userId", userId)
+      )
+      .first();
+
+    if (!adminMembership || adminMembership.role !== "Admin") {
+      throw new Error("Only admins can remove members");
+    }
+
+    if (member.userId === userId) {
+      throw new Error("You cannot remove yourself");
+    }
+
+    await ctx.db.delete(args.memberId);
+  },
+});

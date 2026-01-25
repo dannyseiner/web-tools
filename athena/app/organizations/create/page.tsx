@@ -20,11 +20,11 @@ import { Input } from "@/modules/core/ui/input";
 import { useLoader } from "@/modules/core/hooks/use-loader";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { FileUpload, UploadedFile } from "@/modules/core/ui/file-upload";
 
 type CreateOrgFormData = {
   name: string;
   description?: string;
-  image?: string;
 };
 
 function CreateOrganizationPage() {
@@ -33,6 +33,7 @@ function CreateOrganizationPage() {
   const { setLoading } = useLoader();
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const t = useTranslations();
 
   const createOrgSchema = z.object({
@@ -45,23 +46,15 @@ function CreateOrganizationPage() {
       .string()
       .max(200, t("pages.organizationsCreate.validation.descMaxLength"))
       .optional(),
-    image: z
-      .string()
-      .url(t("pages.organizationsCreate.validation.imageInvalid"))
-      .optional()
-      .or(z.literal("")),
   });
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateOrgFormData>({
     resolver: zodResolver(createOrgSchema),
   });
-
-  const imageUrl = watch("image");
 
   const onSubmit = async (data: CreateOrgFormData) => {
     setLoading({
@@ -75,7 +68,7 @@ function CreateOrganizationPage() {
       const result = await createOrganization({
         name: data.name,
         description: data.description || undefined,
-        image: data.image || undefined,
+        image: uploadedFiles.length > 0 ? uploadedFiles[0].base64 : undefined,
       });
 
       setIsSuccess(true);
@@ -230,60 +223,31 @@ function CreateOrganizationPage() {
               </p>
             </motion.div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <motion.div
               custom={2}
               variants={formFieldVariants}
               initial="hidden"
               animate="visible"
             >
-              <label
-                htmlFor="image"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {t("pages.organizationsCreate.imageLabel")}{" "}
                 <span className="text-muted-foreground">
                   {t("common.optional")}
                 </span>
               </label>
-              <Input
-                id="image"
-                type="url"
-                placeholder={t("pages.organizationsCreate.imagePlaceholder")}
-                icon={{ name: ImageIcon, position: "left" }}
-                error={errors.image?.message}
-                aria-invalid={!!errors.image}
-                {...register("image")}
+              <FileUpload
+                accept="image/*"
+                maxSize={5 * 1024 * 1024}
+                maxFiles={1}
+                files={uploadedFiles}
+                onFilesChange={setUploadedFiles}
+                label={t("pages.organizationsCreate.uploadImageLabel")}
+                showPreview={true}
               />
               <p className="text-xs text-muted-foreground mt-1">
                 {t("pages.organizationsCreate.imageHint")}
               </p>
-
-              {/* Image Preview */}
-              {imageUrl && !errors.image && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 p-4 border border-border rounded-lg bg-background"
-                >
-                  <p className="text-xs font-medium text-foreground mb-2">
-                    {t("pages.organizationsCreate.logoPreview")}
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <Image
-                      src={imageUrl}
-                      alt="Organization logo preview"
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 rounded-xl object-cover border border-border shadow-sm bg-white"
-                    />
-                    <div className="text-xs text-muted-foreground">
-                      {t("pages.organizationsCreate.logoPreviewHint")}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
             </motion.div>
 
             {/* Error Message */}

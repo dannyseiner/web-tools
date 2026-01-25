@@ -22,6 +22,9 @@ export const orgTables = {
     .index("by_userId", ["userId"])
     .index("by_organizationId_and_userId", ["organizationId", "userId"]),
 
+  
+
+
   subscriptions: defineTable({
     organizationId: v.id("organizations"),
     subscriptionType: v.union(
@@ -34,5 +37,5 @@ export const orgTables = {
   organizationSettings: defineTable({
     organizationId: v.id("organizations"),
     apiKey: v.string(),
-  }),
+  }).index("by_organizationId", ["organizationId"]),
 };

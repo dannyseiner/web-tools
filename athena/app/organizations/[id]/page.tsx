@@ -18,7 +18,7 @@ import {
 import { motion } from "motion/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { EmployeesSection } from "@/modules/organizations/components/employees-section";
 
 function OrganizationDetailPage() {
   const params = useParams();
@@ -126,15 +126,13 @@ function OrganizationDetailPage() {
         <div className="flex items-start gap-6">
           {/* Organization Logo */}
           {organization.image ? (
-            <Image
+            <img
               src={organization.image}
               alt={organization.name}
-              width={96}
-              height={96}
               className="w-24 h-24 rounded-2xl object-cover border border-border shadow-md bg-white"
             />
           ) : (
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-md">
+            <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-primary to-orange-600 flex items-center justify-center shadow-md">
               <Building2 className="h-12 w-12 text-white" />
             </div>
           )}
@@ -202,43 +200,14 @@ function OrganizationDetailPage() {
         transition={{ duration: 0.5, delay: 0.15 }}
         className="bg-card border border-border rounded-xl p-6"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-foreground">
-            {t("pages.organizationDetail.projectsSection")}
-          </h2>
-          {(organization.userRole === "Admin" ||
-            organization.userRole === "Manager") && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() =>
-                router.push(`/organizations/${organizationId}/projects/create`)
-              }
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              <Plus className="h-4 w-4" />
-              {t("pages.organizationDetail.createProject")}
-            </motion.button>
-          )}
-        </div>
-
-        {projects === undefined ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : projects === null || projects.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <FolderKanban className="h-8 w-8 text-primary" />
-              </div>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FolderKanban className="h-6 w-6 text-primary" />
+              <h2 className="text-xl font-bold text-foreground">
+                {t("pages.organizationDetail.projectsSection")}
+              </h2>
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {t("pages.organizationDetail.noProjects")}
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              {t("pages.organizationDetail.noProjectsDesc")}
-            </p>
             {(organization.userRole === "Admin" ||
               organization.userRole === "Manager") && (
               <motion.button
@@ -249,164 +218,113 @@ function OrganizationDetailPage() {
                     `/organizations/${organizationId}/projects/create`,
                   )
                 }
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all"
               >
-                <Plus className="h-5 w-5" />
-                {t("pages.organizationDetail.createFirstProject")}
+                <Plus className="h-4 w-4" />
+                {t("pages.organizationDetail.createProject")}
               </motion.button>
             )}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {projects.map((project) => (
-              <motion.div
-                key={project._id}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() =>
-                  router.push(
-                    `/organizations/${organizationId}/projects/${project._id}`,
-                  )
-                }
-                className="bg-background border border-border rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all group"
-              >
-                <div className="flex items-start gap-3">
-                  {project.image ? (
-                    <Image
-                      src={project.image}
-                      alt={project.name}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 rounded-lg object-cover border border-border shadow-sm bg-white"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-sm">
-                      <FolderKanban className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground mb-1 truncate group-hover:text-primary transition-colors">
-                      {project.name}
-                    </h3>
-                    {project.description ? (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {project.description}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground/60 italic">
-                        {t("pages.organizationDetail.noDescription")}
-                      </p>
-                    )}
-                  </div>
+
+          {projects === undefined ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : projects === null || projects.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <FolderKanban className="h-8 w-8 text-primary" />
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {t("pages.organizationDetail.noProjects")}
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                {t("pages.organizationDetail.noProjectsDesc")}
+              </p>
+              {(organization.userRole === "Admin" ||
+                organization.userRole === "Manager") && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    router.push(
+                      `/organizations/${organizationId}/projects/create`,
+                    )
+                  }
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+                >
+                  <Plus className="h-5 w-5" />
+                  {t("pages.organizationDetail.createFirstProject")}
+                </motion.button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projects.map((project) => (
+                <motion.div
+                  key={project._id}
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() =>
+                    router.push(
+                      `/organizations/${organizationId}/projects/${project._id}`,
+                    )
+                  }
+                  className="bg-background border border-border rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all group"
+                >
+                  <div className="flex items-start gap-3">
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        alt={project.name}
+                        className="w-12 h-12 rounded-lg object-cover border border-border shadow-sm bg-white"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-sm">
+                        <FolderKanban className="h-6 w-6 text-white" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground mb-1 truncate group-hover:text-primary transition-colors">
+                        {project.name}
+                      </h3>
+                      {project.description ? (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {project.description}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground/60 italic">
+                          {t("pages.organizationDetail.noDescription")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </motion.div>
 
-      {/* Quick Actions */}
-      {organization.userRole === "Admin" && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-card border border-border rounded-xl p-6"
-        >
-          <h2 className="text-xl font-bold text-foreground mb-4">
-            {t("pages.organizationDetail.adminActions")}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-            >
-              <Users className="h-6 w-6 text-primary mb-2" />
-              <h3 className="font-semibold text-foreground mb-1">
-                {t("pages.organizationDetail.manageMembers")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.manageMembersDesc")}
-              </p>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-            >
-              <Building2 className="h-6 w-6 text-primary mb-2" />
-              <h3 className="font-semibold text-foreground mb-1">
-                {t("pages.organizationDetail.editOrganization")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.editOrganizationDesc")}
-              </p>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-            >
-              <Briefcase className="h-6 w-6 text-primary mb-2" />
-              <h3 className="font-semibold text-foreground mb-1">
-                {t("pages.organizationDetail.viewSettings")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.viewSettingsDesc")}
-              </p>
-            </motion.button>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Info Section */}
+      {/* Members Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6"
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="bg-card border border-border rounded-xl p-6"
       >
-        <h3 className="text-lg font-semibold text-foreground mb-3">
-          {t("pages.organizationDetail.aboutRoles")}
-        </h3>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <Crown className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium text-foreground">
-                {t("pages.organizations.adminTitle")}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.adminRoleDesc")}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Briefcase className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium text-foreground">
-                {t("pages.organizations.managerTitle")}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.managerRoleDesc")}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Users className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium text-foreground">
-                {t("pages.organizations.memberTitle")}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.organizationDetail.memberRoleDesc")}
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 mb-6">
+          <Users className="h-6 w-6 text-primary" />
+          <h2 className="text-xl font-bold text-foreground">
+            {t("pages.organizationDetail.membersSection")}
+          </h2>
         </div>
+        <EmployeesSection
+          organizationId={organizationId}
+          isAdmin={organization.userRole === "Admin"}
+        />
       </motion.div>
     </div>
   );

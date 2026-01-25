@@ -244,11 +244,9 @@ function HomePage() {
                       >
                         <div className="flex items-start gap-3 sm:gap-4">
                           {org.image ? (
-                            <Image
+                            <img
                               src={org.image}
                               alt={org.name}
-                              width={56}
-                              height={56}
                               className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-border shadow-sm bg-white shrink-0"
                             />
                           ) : (

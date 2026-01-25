@@ -24,6 +24,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useTranslations } from "next-intl";
 import { exportWithOrganizationLayout } from "@/modules/core/layouts/organization-layout";
 import Image from "next/image";
+import { FileUpload, UploadedFile } from "@/modules/core/ui/file-upload";
 
 function CreateProjectPage() {
   const params = useParams();
@@ -33,6 +34,7 @@ function CreateProjectPage() {
   const { setLoading } = useLoader();
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const t = useTranslations();
 
   const createProjectSchema = z.object({
@@ -45,11 +47,6 @@ function CreateProjectPage() {
       .string()
       .max(500, t("pages.projectsCreate.validation.descMaxLength"))
       .optional(),
-    image: z
-      .string()
-      .url(t("pages.projectsCreate.validation.imageInvalid"))
-      .optional()
-      .or(z.literal("")),
   });
 
   type CreateProjectFormData = z.infer<typeof createProjectSchema>;
@@ -57,13 +54,10 @@ function CreateProjectPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateProjectFormData>({
     resolver: zodResolver(createProjectSchema),
   });
-
-  const imageUrl = watch("image");
 
   const onSubmit = async (data: CreateProjectFormData) => {
     try {
@@ -78,7 +72,7 @@ function CreateProjectPage() {
         organizationId,
         name: data.name,
         description: data.description || undefined,
-        image: data.image || undefined,
+        image: uploadedFiles.length > 0 ? uploadedFiles[0].base64 : undefined,
       });
 
       setIsSuccess(true);
@@ -212,58 +206,30 @@ function CreateProjectPage() {
                 </p>
               </motion.div>
 
-              {/* Image URL */}
+              {/* Image Upload */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                <label
-                  htmlFor="image"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t("pages.projectsCreate.imageLabel")}{" "}
                   <span className="text-muted-foreground">
                     {t("common.optional")}
                   </span>
                 </label>
-                <Input
-                  id="image"
-                  type="url"
-                  placeholder={t("pages.projectsCreate.imagePlaceholder")}
-                  icon={{ name: ImageIcon, position: "left" }}
-                  error={errors.image?.message}
-                  {...register("image")}
+                <FileUpload
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024}
+                  maxFiles={1}
+                  files={uploadedFiles}
+                  onFilesChange={setUploadedFiles}
+                  label={t("pages.projectsCreate.uploadImageLabel")}
+                  showPreview={true}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   {t("pages.projectsCreate.imageHint")}
                 </p>
-
-                {/* Image Preview */}
-                {imageUrl && imageUrl.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 p-4 bg-accent/50 rounded-lg border border-border"
-                  >
-                    <p className="text-xs font-medium text-foreground mb-2">
-                      {t("pages.projectsCreate.logoPreview")}
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src={imageUrl}
-                        alt="Project preview"
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 rounded-lg object-cover border border-border shadow-md bg-white"
-                      />
-                      <div className="text-xs text-muted-foreground">
-                        {t("pages.projectsCreate.logoPreviewHint")}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
               </motion.div>
 
               {/* Error Message */}

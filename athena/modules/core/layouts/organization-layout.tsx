@@ -104,8 +104,10 @@ const getOrganizationNavLinks = (
 
 export const OrganizationLayout = ({
   children,
+  showNotifications = true,
 }: {
   children: React.ReactNode;
+  showNotifications?: boolean;
 }) => {
   const params = useParams();
   const organizationId = params?.id as string;
@@ -148,6 +150,7 @@ export const OrganizationLayout = ({
         },
       )}
       navbarButtonMenus={navbarButtonMenus}
+      showNotifications={showNotifications}
     >
       {children}
     </Layout>

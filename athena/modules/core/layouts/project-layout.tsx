@@ -69,7 +69,13 @@ const OrganizationHeader = ({
   </div>
 );
 
-export const ProjectLayout = ({ children }: { children: React.ReactNode }) => {
+export const ProjectLayout = ({ 
+  children, 
+  showNotifications = true 
+}: { 
+  children: React.ReactNode;
+  showNotifications?: boolean;
+}) => {
   const params = useParams();
   const router = useRouter();
   const orgId = params?.id as string;
@@ -171,6 +177,7 @@ export const ProjectLayout = ({ children }: { children: React.ReactNode }) => {
         isLoading,
       )}
       navbarButtonMenus={navbarButtonMenus}
+      showNotifications={showNotifications}
     >
       {children}
     </Layout>

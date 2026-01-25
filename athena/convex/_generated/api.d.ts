@@ -10,13 +10,17 @@
 
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as invitations from "../invitations.js";
 import type * as languages from "../languages.js";
 import type * as myFunctions from "../myFunctions.js";
+import type * as notificationHelpers from "../notificationHelpers.js";
+import type * as notifications from "../notifications.js";
 import type * as organization from "../organization.js";
 import type * as organizations from "../organizations.js";
 import type * as profile from "../profile.js";
 import type * as projectSettings from "../projectSettings.js";
 import type * as projects from "../projects.js";
+import type * as schemes_notifications from "../schemes/notifications.js";
 import type * as schemes_organization from "../schemes/organization.js";
 import type * as schemes_project from "../schemes/project.js";
 import type * as schemes_projectSettings from "../schemes/projectSettings.js";
@@ -34,13 +38,17 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  invitations: typeof invitations;
   languages: typeof languages;
   myFunctions: typeof myFunctions;
+  notificationHelpers: typeof notificationHelpers;
+  notifications: typeof notifications;
   organization: typeof organization;
   organizations: typeof organizations;
   profile: typeof profile;
   projectSettings: typeof projectSettings;
   projects: typeof projects;
+  "schemes/notifications": typeof schemes_notifications;
   "schemes/organization": typeof schemes_organization;
   "schemes/project": typeof schemes_project;
   "schemes/projectSettings": typeof schemes_projectSettings;

@@ -151,7 +151,17 @@
       "managerTitle": "Manager",
       "managerDesc": "Může spravovat projekty a zvát nové členy",
       "memberTitle": "Člen",
-      "memberDesc": "Může zobrazovat a účastnit se aktivit organizace"
+      "memberDesc": "Může zobrazovat a účastnit se aktivit organizace",
+      "invitations": {
+        "title": "Čekající pozvánky",
+        "subtitle": "Máte {count} čekající pozvánku",
+        "subtitlePlural": "Máte {count} čekající pozvánky",
+        "invitedBy": "Pozván od {name}",
+        "accept": "Přijmout",
+        "decline": "Odmítnout",
+        "failedToAccept": "Nepodařilo se přijmout pozvánku"
+      },
+      "myOrganizations": "Moje organizace"
     },
     "organizationsCreate": {
       "backToOrganizations": "Zpět na organizace",
@@ -163,11 +173,9 @@
       "descriptionLabel": "Popis",
       "descriptionPlaceholder": "Řekněte nám o vaší organizaci...",
       "descriptionHint": "Stručný popis, který pomůže členům týmu pochopit vaši organizaci",
-      "imageLabel": "URL obrázku loga",
-      "imagePlaceholder": "https://priklad.cz/logo.png",
-      "imageHint": "Poskytněte URL loga vaší organizace",
-      "logoPreview": "Náhled loga:",
-      "logoPreviewHint": "Takto se vaše logo zobrazí",
+      "imageLabel": "Logo organizace",
+      "uploadImageLabel": "Nahrajte logo vaší organizace",
+      "imageHint": "Nahrajte obrázek loga (PNG, JPG, max 5MB)",
       "creating": "Vytváří se...",
       "creatingOrg": "Vytváření organizace",
       "creatingOrgDesc": "Nastavujeme vaši novou organizaci...",
@@ -276,7 +284,30 @@
       "noProjectsDesc": "Začněte vytvořením vašeho prvního projektu pro tuto organizaci",
       "createFirstProject": "Vytvořit první projekt",
       "createProject": "Vytvořit projekt",
-      "viewProject": "Zobrazit projekt"
+      "viewProject": "Zobrazit projekt",
+      "membersSection": "Členové"
+    },
+    "members": {
+      "title": "Členové týmu",
+      "subtitle": "Spravujte členy a pozvánky pro {organizationName}",
+      "backToOrganization": "Zpět na organizaci",
+      "inviteMembers": "Pozvat členy",
+      "activeMembers": "Aktivní členové ({count})",
+      "noMembersYet": "Zatím žádní členové",
+      "noMembersDesc": "Pozvěte lidi, aby se připojili k vaší organizaci",
+      "joined": "Připojeno",
+      "role": {
+        "admin": "Admin",
+        "manager": "Manager",
+        "member": "Člen"
+      },
+      "removeMember": "Odebrat člena",
+      "confirmRemove": "Opravdu chcete odebrat tohoto člena?",
+      "failedToUpdateRole": "Nepodařilo se aktualizovat roli",
+      "failedToRemove": "Nepodařilo se odebrat člena",
+      "accessDenied": "Přístup odepřen",
+      "accessDeniedDesc": "Nemáte oprávnění k zobrazení této stránky",
+      "loadingMembers": "Načítání členů..."
     },
     "projectsCreate": {
       "backToOrganization": "Zpět na organizaci",
@@ -288,11 +319,9 @@
       "descriptionLabel": "Popis",
       "descriptionPlaceholder": "Popište účel a cíle projektu...",
       "descriptionHint": "Stručný popis, který pomůže týmu pochopit cíle projektu",
-      "imageLabel": "URL obrázku projektu",
-      "imagePlaceholder": "https://priklad.cz/projekt.png",
-      "imageHint": "Poskytněte URL obrázku reprezentujícího váš projekt",
-      "logoPreview": "Náhled obrázku:",
-      "logoPreviewHint": "Takto se váš obrázek zobrazí",
+      "imageLabel": "Obrázek projektu",
+      "uploadImageLabel": "Nahrajte obrázek projektu",
+      "imageHint": "Nahrajte obrázek reprezentující váš projekt (PNG, JPG, max 5MB)",
       "creating": "Vytváří se...",
       "creatingProject": "Vytváření projektu",
       "creatingProjectDesc": "Nastavujeme váš nový projekt...",
@@ -341,6 +370,57 @@
     }
   },
   "components": {
+    "notifications": {
+      "title": "Oznámení",
+      "noNotifications": "Žádná oznámení",
+      "noNewNotifications": "Žádná nová oznámení",
+      "notification": "oznámení",
+      "notifications": "oznámení",
+      "notificationsPlural": "oznámení",
+      "markAsRead": "Označit jako přečtené",
+      "delete": "Smazat",
+      "types": {
+        "organizationInvite": "Byli jste pozváni do {organizationName} od {invitedBy}",
+        "organizationError": "Chyba v {organizationName}: {message}",
+        "projectError": "Chyba v {projectName}: {message}",
+        "systemError": "Systémová chyba: {message}",
+        "memberJoined": "{memberName} se připojil do {organizationName}",
+        "memberLeft": "{memberName} opustil {organizationName}",
+        "projectCreated": "{createdBy} vytvořil {projectName} v {organizationName}",
+        "projectDeleted": "{deletedBy} smazal {projectName} z {organizationName}",
+        "default": "Nové oznámení"
+      }
+    },
+    "inviteModal": {
+      "title": "Pozvat členy",
+      "description": "Zadejte e-mailové adresy pro pozvání lidí do vaší organizace",
+      "emailPlaceholder": "Zadejte e-mailovou adresu",
+      "addEmail": "Přidat e-mail",
+      "emailsToInvite": "E-maily k pozvání:",
+      "cancel": "Zrušit",
+      "sendInvites": "Odeslat pozvánky",
+      "errors": {
+        "emailEmpty": "E-mail nemůže být prázdný",
+        "emailInvalid": "Neplatný formát e-mailu",
+        "emailAlreadyAdded": "E-mail již byl přidán",
+        "atLeastOneEmail": "Prosím přidejte alespoň jeden e-mail",
+        "failedToSend": "Nepodařilo se odeslat pozvánky"
+      }
+    },
+    "employeesSection": {
+      "viewAllMembers": "Zobrazit všechny členy",
+      "inviteMembers": "Pozvat členy",
+      "teamMembers": "Členové týmu",
+      "noMembers": "Nebyli nalezeni žádní členové",
+      "pendingInvitations": "Čekající pozvánky",
+      "noPendingInvitations": "Žádné čekající pozvánky",
+      "invitedOn": "Pozván dne",
+      "status": {
+        "pending": "Čeká",
+        "accepted": "Přijato",
+        "rejected": "Odmítnuto"
+      }
+    },
     "organizationLayout": {
       "overview": "Přehled",
       "projects": "Projekty",
