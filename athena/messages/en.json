@@ -2,12 +2,27 @@
   "config": {
     "appName": "Athena EN"
   },
+  "common": {
+    "loading": "Loading...",
+    "back": "Back"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "collapse": "Collapse"
+  },
   "pages": {
     "dashboard": {},
     "organizations": {},
     "auth": {}
   },
-  "components": {},
+  "components": {
+    "user": {
+      "guest": "Guest",
+      "notLoggedIn": "Not logged in",
+      "user": "User",
+      "noEmail": "No email"
+    }
+  },
   "modules": {
     "i18n": {}
   }
