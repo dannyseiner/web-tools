@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Layout, Link, NavButtonType } from "@/modules/core/components/layout";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 const getMainNavLinks = (labels: {
   dashboard: string;
@@ -28,14 +29,15 @@ const getMainNavLinks = (labels: {
   { icon: Settings, label: labels.settings, href: "/settings" },
 ];
 
-export const MainLayout = ({ 
-  children, 
-  showNotifications = true 
-}: { 
+export const MainLayout = ({
+  children,
+  showNotifications = true,
+}: {
   children: React.ReactNode;
   showNotifications?: boolean;
 }) => {
   const t = useTranslations();
+  const { push } = useRouter();
 
   const navbarButtonMenus: NavButtonType[] = [
     {
@@ -50,6 +52,7 @@ export const MainLayout = ({
     },
     {
       className: "bg-primary hover:bg-primary/90 text-primary-foreground",
+      onClick: () => push("/docs"),
       children: (
         <>
           <Book className="mr-2 h-4 w-4" />

@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -129,5 +130,44 @@ export const updateLanguage = mutation({
 
     await ctx.db.patch(languageId, updates);
     return null;
+  },
+});
+
+export const getProjectLanguages = query({
+  args: {
+    projectId: v.id("projects"),
+  },
+  returns: v.array(
+    v.object({
+      _id: v.id("languages"),
+      _creationTime: v.number(),
+      name: v.string(),
+      code: v.string(),
+      nativeName: v.string(),
+      isActive: v.boolean(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const settings = await ctx.db
+      .query("projectSettings")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .first();
+
+    if (!settings?.supportedLanguages?.length) {
+      return [];
+    }
+
+    const result: Doc<"languages">[] = [];
+    for (const code of settings.supportedLanguages) {
+      const lang = await ctx.db
+        .query("languages")
+        .withIndex("by_code", (q) => q.eq("code", code))
+        .first();
+      if (lang) {
+        result.push(lang);
+      }
+    }
+
+    return result;
   },
 });

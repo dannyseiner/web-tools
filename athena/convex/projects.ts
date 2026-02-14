@@ -110,3 +110,20 @@ export const getProject = query({
     return project;
   },
 });
+
+export const getProjectByToken = query({
+  args: {
+    token: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const project = await ctx.db
+      .query("projectSettings")
+      .filter((q) => q.eq(q.field("apiKey"), args.token))
+      .first();
+    if (!project) {
+      return null;
+    }
+
+    return project;
+  },
+});
