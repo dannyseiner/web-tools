@@ -21,7 +21,10 @@
     "viewAll": "Zobrazit vše",
     "configure": "Konfigurovat",
     "change": "Změnit",
-    "enable": "Povolit"
+    "enable": "Povolit",
+    "search": "Hledat",
+    "filter": "Filtrovat",
+    "backToOrganizations": "Zpět na organizace"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -536,16 +539,6 @@
     "tryAgain": "Zkuste to prosím znovu",
     "organizationNotFound": "Organizace nenalezena",
     "organizationNotFoundDesc": "Organizace, kterou hledáte, neexistuje nebo k ní nemáte přístup."
-  },
-  "common": {
-    "cancel": "Zrušit",
-    "save": "Uložit",
-    "delete": "Smazat",
-    "edit": "Upravit",
-    "create": "Vytvořit",
-    "search": "Hledat",
-    "filter": "Filtrovat",
-    "backToOrganizations": "Zpět na organizace"
   },
   "modules": {
     "i18n": {},
