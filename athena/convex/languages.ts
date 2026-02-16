@@ -171,3 +171,49 @@ export const getProjectLanguages = query({
     return result;
   },
 });
+
+function setNested(
+  obj: Record<string, unknown>,
+  path: string,
+  value: string,
+): void {
+  const parts = path.split(".");
+  let current = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (
+      !(part in current) ||
+      typeof current[part] !== "object" ||
+      current[part] === null
+    ) {
+      current[part] = {};
+    }
+    current = current[part] as Record<string, unknown>;
+  }
+  current[parts[parts.length - 1]] = value;
+}
+
+export const getProjectTranslations = query({
+  args: {
+    projectId: v.id("projects"),
+  },
+  returns: v.record(v.string(), v.any()),
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("translations")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .collect();
+
+    const byLanguage: Record<string, Record<string, unknown>> = {};
+
+    for (const row of rows) {
+      const { languageCode, key, value } = row;
+      if (!byLanguage[languageCode]) {
+        byLanguage[languageCode] = {};
+      }
+      setNested(byLanguage[languageCode], key, value);
+    }
+
+    return byLanguage;
+  },
+});

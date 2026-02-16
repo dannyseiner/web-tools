@@ -44,7 +44,15 @@ export const getProjectSettings = query({
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .first();
 
-    return settings;
+    if (!settings) return null;
+
+    return {
+      _id: settings._id,
+      _creationTime: settings._creationTime,
+      projectId: settings.projectId,
+      defaultLanguage: settings.defaultLanguage,
+      supportedLanguages: settings.supportedLanguages,
+    };
   },
 });
 
