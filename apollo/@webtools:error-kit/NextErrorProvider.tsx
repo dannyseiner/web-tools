@@ -18,7 +18,7 @@ export function NextErrorProvider(
   useEffect(() => {
     initErrorClient(opts);
     installGlobalHandlers();
-  }, [opts.dsn, opts.app, opts.env, opts.release]);
+  }, [opts.dsn, opts.projectToken, opts.app, opts.env, opts.release]);
 
   return <ErrorBoundary fallback={fallback}>{children}</ErrorBoundary>;
 }

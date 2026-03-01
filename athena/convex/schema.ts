@@ -6,6 +6,7 @@ import { projectTables } from "./schemes/project";
 import { translationsTables } from "./schemes/translations";
 import { projectSettingsTables } from "./schemes/projectSettings";
 import { notificationTables } from "./schemes/notifications";
+import { errorsTables } from "./schemes/errors";
 
 export default defineSchema({
   ...authTables,
@@ -17,4 +18,5 @@ export default defineSchema({
   ...translationsTables,
   ...projectSettingsTables,
   ...notificationTables,
+  ...errorsTables,
 });

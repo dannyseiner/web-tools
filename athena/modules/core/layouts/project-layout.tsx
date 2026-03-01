@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Languages,
   Building2,
+  Bug,
 } from "lucide-react";
 import {
   Layout,
@@ -69,10 +70,10 @@ const OrganizationHeader = ({
   </div>
 );
 
-export const ProjectLayout = ({ 
-  children, 
-  showNotifications = true 
-}: { 
+export const ProjectLayout = ({
+  children,
+  showNotifications = true,
+}: {
   children: React.ReactNode;
   showNotifications?: boolean;
 }) => {
@@ -123,24 +124,9 @@ export const ProjectLayout = ({
       href: `/organizations/${orgId}/projects/${projectId}/translations`,
     },
     {
-      icon: ListTodo,
-      label: t("components.projectLayout.tasks"),
-      href: `/organizations/${orgId}/projects/${projectId}/tasks`,
-    },
-    {
-      icon: Users,
-      label: t("components.projectLayout.team"),
-      href: `/organizations/${orgId}/projects/${projectId}/team`,
-    },
-    {
-      icon: FileText,
-      label: t("components.projectLayout.documents"),
-      href: `/organizations/${orgId}/projects/${projectId}/documents`,
-    },
-    {
-      icon: Calendar,
-      label: t("components.projectLayout.timeline"),
-      href: `/organizations/${orgId}/projects/${projectId}/timeline`,
+      icon: Bug,
+      label: t("components.projectLayout.errors"),
+      href: `/organizations/${orgId}/projects/${projectId}/errors`,
     },
     {
       icon: BarChart3,
@@ -178,6 +164,7 @@ export const ProjectLayout = ({
       )}
       navbarButtonMenus={navbarButtonMenus}
       showNotifications={showNotifications}
+      organizationId={orgId}
     >
       {children}
     </Layout>

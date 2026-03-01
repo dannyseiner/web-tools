@@ -370,6 +370,21 @@
       "newErrors": "Nové chyby",
       "comingSoon": "Již brzy",
       "comingSoonDesc": "Funkce správy projektů jsou ve vývoji. Brzy budete moci spravovat úkoly, členy týmu a další."
+    },
+    "reportedErrors": {
+      "title": "Nahlášené chyby",
+      "countOne": "1 chyba nahlášena",
+      "countOther": "{count} chyb nahlášeno",
+      "filters": "Filtry",
+      "searchPlaceholder": "Hledat v zprávě nebo typu...",
+      "allTypes": "Všechny typy",
+      "clearFilters": "Zrušit filtry",
+      "empty": "Žádné chyby neodpovídají filtrům. Nahlášené chyby z vaší aplikace se zde zobrazí.",
+      "stackTrace": "Stack trace",
+      "userAgent": "User agent",
+      "env": "env:",
+      "release": "release:",
+      "extra": "Extra"
     }
   },
   "components": {
@@ -433,6 +448,7 @@
     },
     "projectLayout": {
       "overview": "Přehled",
+      "errors": "Chyby",
       "tasks": "Úkoly",
       "team": "Tým",
       "documents": "Dokumenty",

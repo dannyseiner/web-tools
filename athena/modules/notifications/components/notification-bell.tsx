@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Bell, X, Loader2 } from "lucide-react";
@@ -10,17 +10,35 @@ import { useTranslations } from "next-intl";
 
 interface NotificationBellProps {
   visible?: boolean;
+  organizationId?: string;
 }
 
-export function NotificationBell({ visible = true }: NotificationBellProps) {
+export function NotificationBell({ visible = true, organizationId }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations();
-  const notifications = useQuery(api.notifications.getUserNotifications);
+  const userNotifications = useQuery(api.notifications.getUserNotifications);
+  const orgNotifications = useQuery(
+    api.notifications.getOrganizationNotifications,
+    organizationId ? { organizationId: organizationId as Id<"organizations"> } : "skip",
+  );
   const markAsRead = useMutation(api.notifications.markAsRead);
   const deleteNotification = useMutation(api.notifications.deleteNotification);
 
-  const unreadCount =
-    notifications?.filter((n) => !n.read).length ?? 0;
+  const notifications = useMemo(() => {
+    const user = userNotifications ?? [];
+    const org = orgNotifications ?? [];
+    const byId = new Map<string, (typeof user)[number]>();
+    for (const n of user) byId.set(n._id, n);
+    for (const n of org) if (!byId.has(n._id)) byId.set(n._id, n);
+    return Array.from(byId.values()).sort(
+      (a, b) => b._creationTime - a._creationTime,
+    );
+  }, [userNotifications, orgNotifications]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const isLoading =
+    userNotifications === undefined ||
+    (organizationId && orgNotifications === undefined);
 
   if (!visible) return null;
 
@@ -141,7 +159,7 @@ export function NotificationBell({ visible = true }: NotificationBellProps) {
                 </div>
               </div>
 
-              {notifications === undefined ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>

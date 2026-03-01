@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as errors from "../errors.js";
 import type * as http from "../http.js";
 import type * as invitations from "../invitations.js";
 import type * as languages from "../languages.js";
@@ -20,6 +21,7 @@ import type * as organizations from "../organizations.js";
 import type * as profile from "../profile.js";
 import type * as projectSettings from "../projectSettings.js";
 import type * as projects from "../projects.js";
+import type * as schemes_errors from "../schemes/errors.js";
 import type * as schemes_notifications from "../schemes/notifications.js";
 import type * as schemes_organization from "../schemes/organization.js";
 import type * as schemes_project from "../schemes/project.js";
@@ -37,6 +39,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  errors: typeof errors;
   http: typeof http;
   invitations: typeof invitations;
   languages: typeof languages;
@@ -48,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   profile: typeof profile;
   projectSettings: typeof projectSettings;
   projects: typeof projects;
+  "schemes/errors": typeof schemes_errors;
   "schemes/notifications": typeof schemes_notifications;
   "schemes/organization": typeof schemes_organization;
   "schemes/project": typeof schemes_project;

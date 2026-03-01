@@ -1,5 +1,6 @@
 export type ErrorClientOptions = {
   dsn: string;
+  projectToken?: string;
   app?: string;
   env?: string;
   release?: string;
@@ -38,6 +39,7 @@ export async function captureException(err: unknown, extras?: CaptureExtras) {
     userAgent:
       typeof navigator !== "undefined" ? navigator.userAgent : undefined,
     timestamp: new Date().toISOString(),
+    projectToken: _opts.projectToken,
     app: _opts.app,
     env: _opts.env,
     release: _opts.release,
@@ -46,9 +48,15 @@ export async function captureException(err: unknown, extras?: CaptureExtras) {
   };
 
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (_opts.projectToken) {
+      headers["X-Project-Token"] = _opts.projectToken;
+    }
     await fetch(_opts.dsn, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload),
       keepalive: true, // important pro page unload
     });

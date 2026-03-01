@@ -38,6 +38,7 @@ export type LayoutProps = {
   navbarButtonMenus: NavButtonType[];
   showNotifications?: boolean;
   title?: string;
+  organizationId?: string;
 };
 
 export const Layout = ({
@@ -46,6 +47,7 @@ export const Layout = ({
   navbarButtonMenus,
   showNotifications = true,
   title,
+  organizationId,
 }: LayoutProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -393,7 +395,7 @@ export const Layout = ({
             </h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <NotificationBell visible={showNotifications} />
+            <NotificationBell visible={showNotifications} organizationId={organizationId} />
             {showNotifications && (
               <div className="w-px h-6 bg-border hidden sm:block" />
             )}
