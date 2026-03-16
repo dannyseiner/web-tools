@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@webtools/error-kit": "file:../apollo/@webtools:error-kit",
+    "@webtools/client": "file:../apollo/@webtools:client",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"

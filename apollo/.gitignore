@@ -1,2 +1,5 @@
 /@webtools:cli/node_modules
 /@webtools:error-kit/node_modules
+/@webtools:client/node_modules
+/@webtools:client/dist
+/@webtools:i18n/node_modules

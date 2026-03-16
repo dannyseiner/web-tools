@@ -1,6 +1,6 @@
 "use client";
 
-import { NextErrorProvider } from "@webtools/error-kit";
+import { NextErrorProvider } from "@webtools/client";
 
 const ERROR_API_URL = "http://localhost:3000/api/errors";
 const projectToken = process.env.NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN;
