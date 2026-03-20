@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ErrorKitWrapper } from "./ErrorKitWrapper";
-import { I18nWrapper } from "./I18nWrapper";
 import { loadMessages } from "@webtools/client/server";
 import path from "path";
 import "./globals.css";
+import { I18nProvider, NextErrorProvider } from "@webtools/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,16 +32,20 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang={locale}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <NextErrorProvider projectToken="test">
+      <I18nProvider
+        locale={locale}
+        messages={messages}
+        projectToken={process.env.NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN!}
       >
-        <ErrorKitWrapper>
-          <I18nWrapper locale={locale} messages={messages}>
+        <html lang={locale}>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
             {children}
-          </I18nWrapper>
-        </ErrorKitWrapper>
-      </body>
-    </html>
+          </body>
+        </html>
+      </I18nProvider>
+    </NextErrorProvider>
   );
 }

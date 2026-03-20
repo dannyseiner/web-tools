@@ -225,6 +225,42 @@ export const upsertTranslation = mutation({
   },
 });
 
+export const createMissingTranslation = mutation({
+  args: {
+    projectId: v.id("projects"),
+    languageCode: v.string(),
+    key: v.string(),
+  },
+  returns: v.union(v.id("translations"), v.null()),
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("translations")
+      .withIndex("by_project_language_and_key", (q) =>
+        q
+          .eq("projectId", args.projectId)
+          .eq("languageCode", args.languageCode)
+          .eq("key", args.key),
+      )
+      .first();
+
+    if (existing) return null;
+
+    const parts = args.key.split(".");
+    const namespace = parts.length > 1 ? parts[0] : undefined;
+
+    const translationId = await ctx.db.insert("translations", {
+      projectId: args.projectId,
+      languageCode: args.languageCode,
+      key: args.key,
+      value: "",
+      namespace,
+      description: "Auto-created from missing translation report",
+    });
+
+    return translationId;
+  },
+});
+
 export const deleteTranslation = mutation({
   args: {
     translationId: v.id("translations"),

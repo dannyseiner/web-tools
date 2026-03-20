@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
-const DEFAULT_API_PATH = "http://localhost:3000/api";
+const DEFAULT_API_PATH = "https://web-tools-ashen.vercel.app/api";
 const PROJECT_TOKEN_ENV = "WEBTOOLS_PROJECT_TOKEN";
 
 const RESET = "\x1b[0m";

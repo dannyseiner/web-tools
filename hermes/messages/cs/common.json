@@ -1,5 +1,5 @@
 {
   "greeting": "Ahoj",
-  "welcome": "Vitejte ve Web Tools",
-  "language": "Cestina"
+  "welcome": "Vítejte ve Web Tools",
+  "triggerError": "Vyvolat chybu"
 }

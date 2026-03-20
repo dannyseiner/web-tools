@@ -74,6 +74,17 @@ export const POST = withAuthAndCors(async (request, project) => {
     extraJson: body.extra != null ? JSON.stringify(body.extra) : undefined,
   });
 
+  if (body.tags?.source === "i18n" && body.extra) {
+    const { key, locale } = body.extra as { key?: string; locale?: string };
+    if (typeof key === "string" && typeof locale === "string") {
+      await convex.mutation(api.translations.createMissingTranslation, {
+        projectId: project.projectId,
+        languageCode: locale,
+        key,
+      });
+    }
+  }
+
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
     headers: withCorsHeaders({ "Content-Type": "application/json" }),

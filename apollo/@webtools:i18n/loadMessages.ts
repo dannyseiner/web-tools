@@ -15,6 +15,24 @@ export function mergeModules(
   return merged;
 }
 
+export async function getAvailableLocales(
+  messagesDir: string,
+): Promise<string[]> {
+  const fs = await import("fs");
+  const path = await import("path");
+
+  const resolved = path.resolve(messagesDir);
+
+  if (!fs.existsSync(resolved)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(resolved, { withFileTypes: true })
+    .filter((entry: { isDirectory: () => boolean }) => entry.isDirectory())
+    .map((entry: { name: string }) => entry.name);
+}
+
 export async function loadMessages(
   locale: string,
   messagesDir: string,
@@ -40,4 +58,17 @@ export async function loadMessages(
   }
 
   return merged;
+}
+
+export async function loadAllMessages(
+  messagesDir: string,
+): Promise<Record<string, Messages>> {
+  const locales = await getAvailableLocales(messagesDir);
+  const all: Record<string, Messages> = {};
+
+  for (const locale of locales) {
+    all[locale] = await loadMessages(locale, messagesDir);
+  }
+
+  return all;
 }

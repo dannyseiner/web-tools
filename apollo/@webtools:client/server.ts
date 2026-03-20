@@ -1,1 +1,6 @@
-export { loadMessages, mergeModules } from "@webtools/i18n/server";
+export {
+  loadMessages,
+  loadAllMessages,
+  getAvailableLocales,
+  mergeModules,
+} from "@webtools/i18n/server";

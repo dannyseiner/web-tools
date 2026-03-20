@@ -1,1 +1,6 @@
-export { loadMessages, mergeModules } from "./loadMessages";
+export {
+  loadMessages,
+  loadAllMessages,
+  getAvailableLocales,
+  mergeModules,
+} from "./loadMessages";
