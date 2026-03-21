@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useQuery } from "convex/react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
@@ -13,11 +13,79 @@ import {
   ChevronRight,
   Calendar,
   Filter,
+  MoreVertical,
+  Trash2,
+  Trash,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import { exportWithProjectLayout } from "@/modules/core/layouts/project-layout";
 import { useDebounce } from "@/modules/core/hooks/use-debounce";
+
+function ErrorActionMenu({
+  onDelete,
+  onDeleteAll,
+}: {
+  onDelete: () => void;
+  onDeleteAll: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+        className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+      >
+        <MoreVertical className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-popover p-1 shadow-lg">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+              setOpen(false);
+            }}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteAll();
+              setOpen(false);
+            }}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash className="h-4 w-4" />
+            Delete all duplicates
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ErrorsPage() {
   const params = useParams();
@@ -29,6 +97,8 @@ function ErrorsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const deleteError = useMutation(api.errors.deleteError);
+  const deleteDuplicates = useMutation(api.errors.deleteDuplicateErrors);
 
   const errors = useQuery(api.errors.getReportedErrors, {
     projectId,
@@ -159,42 +229,60 @@ function ErrorsPage() {
                     exit={{ opacity: 0 }}
                     className="bg-card"
                   >
-                    <button
-                      type="button"
-                      onClick={() => setExpandedId(isExpanded ? null : err._id)}
-                      className="flex w-full items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
-                    >
-                      <span className="mt-0.5 shrink-0 text-muted-foreground">
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                            {err.name}
-                          </span>
-                          {err.app && (
-                            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                              {err.app}
-                            </span>
+                    <div className="flex items-start">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedId(isExpanded ? null : err._id)}
+                        className="flex flex-1 items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
+                      >
+                        <span className="mt-0.5 shrink-0 text-muted-foreground">
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
                           )}
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(err.timestamp).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="mt-1 truncate text-sm font-medium text-foreground">
-                          {err.message}
-                        </p>
-                        {err.url && (
-                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                            {err.url}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                              {err.name}
+                            </span>
+                            {err.app && (
+                              <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                                {err.app}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(err.timestamp).toLocaleString()}
+                            </span>
+                          </div>
+                          <p className="mt-1 truncate text-sm font-medium text-foreground">
+                            {err.message}
                           </p>
-                        )}
+                          {err.url && (
+                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                              {err.url}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                      <div className="p-4">
+                        <ErrorActionMenu
+                          onDelete={() => {
+                            deleteError({ errorId: err._id });
+                            if (expandedId === err._id) setExpandedId(null);
+                          }}
+                          onDeleteAll={() => {
+                            deleteDuplicates({
+                              projectId,
+                              name: err.name,
+                              message: err.message,
+                            });
+                            setExpandedId(null);
+                          }}
+                        />
                       </div>
-                    </button>
+                    </div>
                     <AnimatePresence>
                       {isExpanded && (
                         <motion.div

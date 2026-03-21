@@ -225,6 +225,59 @@ export const upsertTranslation = mutation({
   },
 });
 
+export const bulkUpsertTranslations = mutation({
+  args: {
+    projectId: v.id("projects"),
+    languageCode: v.string(),
+    translations: v.array(
+      v.object({
+        key: v.string(),
+        value: v.string(),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    let created = 0;
+    let updated = 0;
+
+    for (const { key, value } of args.translations) {
+      const existing = await ctx.db
+        .query("translations")
+        .withIndex("by_project_language_and_key", (q) =>
+          q
+            .eq("projectId", args.projectId)
+            .eq("languageCode", args.languageCode)
+            .eq("key", key),
+        )
+        .first();
+
+      const parts = key.split(".");
+      const namespace = parts.length > 1 ? parts[0] : undefined;
+
+      if (existing) {
+        if (existing.value !== value) {
+          await ctx.db.patch(existing._id, { value, namespace });
+          updated++;
+        }
+      } else {
+        await ctx.db.insert("translations", {
+          projectId: args.projectId,
+          languageCode: args.languageCode,
+          key,
+          value,
+          namespace,
+        });
+        created++;
+      }
+    }
+
+    return { created, updated };
+  },
+});
+
 export const createMissingTranslation = mutation({
   args: {
     projectId: v.id("projects"),

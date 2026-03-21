@@ -32,12 +32,8 @@ export default async function RootLayout({
   );
 
   return (
-    <NextErrorProvider projectToken="test">
-      <I18nProvider
-        locale={locale}
-        messages={messages}
-        projectToken={process.env.NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN!}
-      >
+    <NextErrorProvider>
+      <I18nProvider locale={locale} messages={messages}>
         <html lang={locale}>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}

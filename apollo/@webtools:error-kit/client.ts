@@ -1,8 +1,9 @@
 const DEFAULT_DSN = "https://web-tools-ashen.vercel.app/api/errors";
+// const DEFAULT_DSN = "http://localhost:3000/api/errors";
 
 export type ErrorClientOptions = {
   dsn?: string;
-  projectToken: string;
+  projectToken?: string;
   app?: string;
   env?: string;
   release?: string;
@@ -17,13 +18,21 @@ export type CaptureExtras = {
 let _opts: ErrorClientOptions | null = null;
 
 export function initErrorClient(opts: ErrorClientOptions) {
-  if (!opts.projectToken) {
+  const resolvedToken =
+    opts.projectToken ?? process.env.NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN ?? "";
+
+  if (!resolvedToken) {
     console.error(
       "[@webtools/client] Missing projectToken. Error reporting will not work. " +
-        "Pass your NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN via the NextErrorProvider props.",
+        "Set NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN in your .env or pass it via NextErrorProvider props.",
     );
   }
-  _opts = { ...opts, dsn: opts.dsn ?? DEFAULT_DSN };
+
+  _opts = {
+    ...opts,
+    projectToken: resolvedToken,
+    dsn: opts.dsn ?? DEFAULT_DSN,
+  };
 }
 
 function safeString(v: unknown) {

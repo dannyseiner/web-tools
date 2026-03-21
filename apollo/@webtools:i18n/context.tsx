@@ -9,6 +9,7 @@ import React, {
 } from "react";
 
 const DEFAULT_DSN = "https://web-tools-ashen.vercel.app/api/errors";
+// const DEFAULT_DSN = "http://localhost:3000/api/errors";
 
 type Messages = Record<string, unknown>;
 
@@ -30,7 +31,7 @@ const I18nContext = createContext<I18nContextValue | null>(null);
 export type I18nProviderProps = {
   locale: string;
   messages: Messages;
-  projectToken: string;
+  projectToken?: string;
   dsn?: string;
   children: React.ReactNode;
   onMissingTranslation?: (info: MissingTranslationInfo) => void;
@@ -44,15 +45,18 @@ export function I18nProvider({
   children,
   onMissingTranslation,
 }: I18nProviderProps) {
+  const resolvedToken =
+    projectToken ?? process.env.NEXT_PUBLIC_WEBTOOLS_PROJECT_TOKEN ?? "";
+
   const value = useMemo(
     () => ({
       locale,
       messages,
-      projectToken,
+      projectToken: resolvedToken,
       dsn: dsn ?? DEFAULT_DSN,
       onMissingTranslation,
     }),
-    [locale, messages, projectToken, dsn, onMissingTranslation],
+    [locale, messages, resolvedToken, dsn, onMissingTranslation],
   );
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }

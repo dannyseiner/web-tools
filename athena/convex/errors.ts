@@ -102,3 +102,106 @@ export const getReportedErrors = query({
     return errors;
   },
 });
+
+export const getErrorsLast24h = query({
+  args: {
+    projectId: v.id("projects"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) return [];
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) return [];
+
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", project.organizationId).eq("userId", userId),
+      )
+      .first();
+    if (!membership) return [];
+
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const errors = await ctx.db
+      .query("reportedErrors")
+      .withIndex("by_project_and_timestamp", (q) =>
+        q.eq("projectId", args.projectId),
+      )
+      .order("desc")
+      .collect();
+
+    return errors
+      .filter((e) => e.timestamp >= cutoff)
+      .map((e) => ({
+        timestamp: e.timestamp,
+        name: e.name,
+        tagsJson: e.tagsJson,
+      }));
+  },
+});
+
+export const deleteError = mutation({
+  args: {
+    errorId: v.id("reportedErrors"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Not authenticated");
+
+    const error = await ctx.db.get(args.errorId);
+    if (!error) return;
+
+    const project = await ctx.db.get(error.projectId);
+    if (!project) return;
+
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", project.organizationId).eq("userId", userId),
+      )
+      .first();
+    if (!membership) throw new Error("Not authorized");
+
+    await ctx.db.delete(args.errorId);
+  },
+});
+
+export const deleteDuplicateErrors = mutation({
+  args: {
+    projectId: v.id("projects"),
+    name: v.string(),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Not authenticated");
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) return;
+
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", project.organizationId).eq("userId", userId),
+      )
+      .first();
+    if (!membership) throw new Error("Not authorized");
+
+    const errors = await ctx.db
+      .query("reportedErrors")
+      .withIndex("by_project_and_timestamp", (q) =>
+        q.eq("projectId", args.projectId),
+      )
+      .collect();
+
+    const matching = errors.filter(
+      (e) => e.name === args.name && e.message === args.message,
+    );
+
+    for (const err of matching) {
+      await ctx.db.delete(err._id);
+    }
+  },
+});

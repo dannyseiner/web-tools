@@ -10,15 +10,114 @@ import {
   Calendar,
   User,
   Loader2,
-  ListTodo,
-  Users,
-  FileText,
-  BarChart3,
+  AlertCircle,
+  Languages,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useMemo, useRef, useEffect } from "react";
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
+
+function ErrorsChart({
+  errors,
+}: {
+  errors: { timestamp: string; name: string; tagsJson?: string }[];
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<Chart | null>(null);
+
+  const hourlyData = useMemo(() => {
+    const now = Date.now();
+    const buckets = Array.from({ length: 24 }, (_, i) => {
+      const hour = new Date(now - (23 - i) * 60 * 60 * 1000);
+      hour.setMinutes(0, 0, 0);
+      return { label: hour, count: 0 };
+    });
+
+    for (const err of errors) {
+      const ts = new Date(err.timestamp).getTime();
+      for (let i = 0; i < buckets.length; i++) {
+        const bucketStart = buckets[i].label.getTime();
+        const bucketEnd = bucketStart + 60 * 60 * 1000;
+        if (ts >= bucketStart && ts < bucketEnd) {
+          buckets[i].count++;
+          break;
+        }
+      }
+    }
+
+    return buckets;
+  }, [errors]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+
+    const ctx = canvasRef.current.getContext("2d");
+    if (!ctx) return;
+
+    chartRef.current = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: hourlyData.map((b) =>
+          b.label.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        ),
+        datasets: [
+          {
+            label: "Errors",
+            data: hourlyData.map((b) => b.count),
+            backgroundColor: "rgba(239, 68, 68, 0.5)",
+            borderColor: "rgb(239, 68, 68)",
+            borderWidth: 1,
+            borderRadius: 4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              maxRotation: 45,
+              autoSkip: true,
+              maxTicksLimit: 12,
+              font: { size: 11 },
+            },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              font: { size: 11 },
+            },
+            grid: {
+              color: "rgba(128, 128, 128, 0.1)",
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      chartRef.current?.destroy();
+      chartRef.current = null;
+    };
+  }, [hourlyData]);
+
+  return <canvas ref={canvasRef} />;
+}
 
 function ProjectDetailPage() {
   const params = useParams();
@@ -27,14 +126,26 @@ function ProjectDetailPage() {
   const projectId = params.projectId as Id<"projects">;
   const t = useTranslations();
 
-  const project = useQuery(api.projects.getProject, {
-    projectId,
-  });
-
+  const project = useQuery(api.projects.getProject, { projectId });
   const organization = useQuery(
     api.organizations.getOrganization,
     project ? { organizationId: project.organizationId } : "skip",
   );
+  const errorsLast24h = useQuery(api.errors.getErrorsLast24h, { projectId });
+
+  const { totalErrors, i18nErrors } = useMemo(() => {
+    if (!errorsLast24h) return { totalErrors: 0, i18nErrors: 0 };
+    let i18n = 0;
+    for (const err of errorsLast24h) {
+      if (err.tagsJson) {
+        try {
+          const tags = JSON.parse(err.tagsJson);
+          if (tags.source === "i18n") i18n++;
+        } catch {}
+      }
+    }
+    return { totalErrors: errorsLast24h.length, i18nErrors: i18n };
+  }, [errorsLast24h]);
 
   if (project === undefined) {
     return (
@@ -103,25 +214,22 @@ function ProjectDetailPage() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="bg-card border border-border rounded-xl overflow-hidden"
       >
-        {/* Project Info */}
         <div className="p-8">
           <div className="flex items-start gap-6">
-            {/* Project Icon */}
             {project.image ? (
               <Image
                 src={project.image}
                 alt={project.name}
                 width={96}
                 height={96}
-                className="w-24 h-24 rounded-2xl object-cover border-4 border-background shadow-xl "
+                className="w-24 h-24 rounded-2xl object-cover border-4 border-background shadow-xl"
               />
             ) : (
-              <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl  border-4 border-background">
+              <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl border-4 border-background">
                 <FolderKanban className="h-12 w-12 text-white" />
               </div>
             )}
 
-            {/* Project Details */}
             <div className="flex-1 -mt-2">
               <h1 className="text-3xl font-bold text-foreground mb-2">
                 {project.name}
@@ -136,7 +244,6 @@ function ProjectDetailPage() {
                 </p>
               )}
 
-              {/* Metadata */}
               <div className="flex items-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -164,80 +271,53 @@ function ProjectDetailPage() {
         </div>
       </motion.div>
 
-      {/* Quick Stats */}
+      {/* Dashboard: Chart + Stats */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4"
       >
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ListTodo className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">0</p>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.projectDetail.tasks")}
-              </p>
-            </div>
+        {/* Chart - takes 2/3 */}
+        <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6">
+          <h2 className="text-sm font-medium text-foreground mb-4">
+            {t("pages.projectDetail.errorsLast24h")}
+          </h2>
+          <div className="h-64">
+            {errorsLast24h === undefined ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <ErrorsChart errors={errorsLast24h} />
+            )}
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-              <Users className="h-5 w-5 text-orange-500" />
+        {/* Stats - takes 1/3 */}
+        <div className="flex flex-col gap-4">
+          <div className="flex-1 bg-card border border-border rounded-xl p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">0</p>
+              <p className="text-3xl font-bold text-foreground">{totalErrors}</p>
               <p className="text-sm text-muted-foreground">
-                {t("pages.projectDetail.members")}
+                {t("pages.projectDetail.totalErrors24h")}
               </p>
             </div>
           </div>
-        </div>
 
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-purple-500" />
+          <div className="flex-1 bg-card border border-border rounded-xl p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+              <Languages className="h-6 w-6 text-orange-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">0</p>
+              <p className="text-3xl font-bold text-foreground">{i18nErrors}</p>
               <p className="text-sm text-muted-foreground">
-                {t("pages.projectDetail.documents")}
+                {t("pages.projectDetail.i18nErrors24h")}
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <BarChart3 className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">0</p>
-              <p className="text-sm text-muted-foreground">
-                {t("pages.projectDetail.newErrors")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Coming Soon Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="bg-card border border-border rounded-xl p-12 text-center"
-      >
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <FolderKanban className="h-10 w-10 text-primary" />
           </div>
         </div>
       </motion.div>

@@ -14,6 +14,7 @@ export const getProjectSettings = query({
       projectId: v.id("projects"),
       defaultLanguage: v.optional(v.string()),
       supportedLanguages: v.array(v.string()),
+      apiKey: v.optional(v.string()),
     }),
     v.null(),
   ),
@@ -52,6 +53,7 @@ export const getProjectSettings = query({
       projectId: settings.projectId,
       defaultLanguage: settings.defaultLanguage,
       supportedLanguages: settings.supportedLanguages,
+      apiKey: settings.apiKey,
     };
   },
 });
