@@ -111,7 +111,21 @@ function reportMissingTranslation(
   } catch {}
 }
 
-export function useTranslation(prefix?: string) {
+const COOKIE_NAME = "webtools-locale";
+
+function changeLocale(newLocale: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(newLocale)}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+  window.location.href = window.location.href;
+}
+
+export type UseTranslationReturn = {
+  t: (key: string) => string;
+  locale: string;
+  changeLocale: (newLocale: string) => void;
+};
+
+export function useTranslation(prefix?: string): UseTranslationReturn {
   const ctx = useContext(I18nContext);
 
   if (!ctx) {
@@ -149,5 +163,7 @@ export function useTranslation(prefix?: string) {
     [ctx, prefix],
   );
 
-  return t;
+  return { t, locale: ctx.locale, changeLocale };
 }
+
+export { COOKIE_NAME };

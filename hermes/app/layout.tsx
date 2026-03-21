@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { loadMessages } from "@webtools/client/server";
+import { loadMessages, LOCALE_COOKIE_NAME } from "@webtools/client/server";
 import path from "path";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { I18nProvider, NextErrorProvider } from "@webtools/client";
 
@@ -25,7 +26,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = "en";
+  const cookieStore = await cookies();
+  const locale = cookieStore.get(LOCALE_COOKIE_NAME)?.value ?? "en";
   const messages = await loadMessages(
     locale,
     path.join(process.cwd(), "messages"),

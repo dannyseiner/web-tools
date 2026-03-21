@@ -1,9 +1,10 @@
 "use client";
 
+import LanguageSwitcher from "@/src/components/language-switcher";
 import { useTranslation } from "@webtools/client";
 
 export default function Home() {
-  const t = useTranslation("common");
+  const { t } = useTranslation("common");
 
   const triggerError = () => {
     throw new Error("Test error from hermes");
@@ -11,6 +12,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <LanguageSwitcher />
       <div className="w-full max-w-md text-center">
         <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           {t("greeting")}
@@ -23,7 +25,6 @@ export default function Home() {
         >
           {t("triggerError")}
         </button>
-        <p>{t("missing.key.test.api-report")}</p>
       </div>
     </div>
   );
