@@ -3,6 +3,7 @@
 import {
   FolderKanban,
   ListTodo,
+  List,
   Users,
   Settings,
   BarChart3,
@@ -127,6 +128,11 @@ export const ProjectLayout = ({
       icon: Bug,
       label: t("components.projectLayout.errors"),
       href: `/organizations/${orgId}/projects/${projectId}/errors`,
+    },
+    {
+      icon: List,
+      label: t("components.projectLayout.lists"),
+      href: `/organizations/${orgId}/projects/${projectId}/lists`,
     },
     {
       icon: BarChart3,

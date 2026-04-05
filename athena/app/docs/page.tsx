@@ -1,6 +1,7 @@
 "use client";
 
 import { DocSection } from "@/modules/docs/components/doc-section";
+import { CodeBlock } from "@/modules/docs/components/code-block";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -25,6 +26,13 @@ export default function DocsPage() {
         </ul>
       </DocSection>
 
+      <DocSection title={t("installation")} id="installation">
+        <p>{t("installationDesc")}</p>
+        <CodeBlock language="bash" code={`npm install @uu-webtools/client`} />
+        <p className="mt-4">{t("orWithYarn")}</p>
+        <CodeBlock language="bash" code={`yarn add @uu-webtools/client`} />
+      </DocSection>
+
       <DocSection title={t("quickLinks")} id="quick-links">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
@@ -39,6 +47,17 @@ export default function DocsPage() {
           </Link>
 
           <Link
+            href="/docs/i18n"
+            className="group p-6 border border-border rounded-lg hover:border-primary transition-colors"
+          >
+            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+              {t("i18nTitle")}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </h3>
+            <p className="text-sm text-muted-foreground">{t("i18nDesc")}</p>
+          </Link>
+
+          <Link
             href="/docs/error-handling"
             className="group p-6 border border-border rounded-lg hover:border-primary transition-colors"
           >
@@ -47,6 +66,17 @@ export default function DocsPage() {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </h3>
             <p className="text-sm text-muted-foreground">{t("errorDesc")}</p>
+          </Link>
+
+          <Link
+            href="/docs/cli"
+            className="group p-6 border border-border rounded-lg hover:border-primary transition-colors"
+          >
+            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+              {t("cliTitle")}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </h3>
+            <p className="text-sm text-muted-foreground">{t("cliDesc")}</p>
           </Link>
         </div>
       </DocSection>

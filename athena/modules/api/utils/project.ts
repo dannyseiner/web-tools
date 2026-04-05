@@ -1,6 +1,7 @@
 import { api } from "@/convex/_generated/api";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { ConvexHttpClient } from "convex/browser";
+import { withCorsHeaders } from "./cors";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -12,12 +13,18 @@ export async function authenticate(
   const token = request.headers.get("X-Project-Token");
 
   if (!token) {
-    return new Response("Missing authorization token", { status: 401 });
+    return new Response("Missing authorization token", {
+      status: 401,
+      headers: withCorsHeaders(),
+    });
   }
 
   const project = await convex.query(api.projects.getProjectByToken, { token });
   if (!project) {
-    return new Response("Invalid authorization token", { status: 401 });
+    return new Response("Invalid authorization token", {
+      status: 401,
+      headers: withCorsHeaders(),
+    });
   }
 
   return project;

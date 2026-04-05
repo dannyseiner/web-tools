@@ -5,8 +5,9 @@ import {
   Shield,
   AlertTriangle,
   Book,
-  Package,
+  Terminal,
   Languages,
+  List,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
@@ -33,12 +34,34 @@ const i18nLinks: DocLink[] = [
     titleKey: "modules.docs.sidebar.i18n.overview",
     href: "/docs/i18n#overview",
   },
-  { titleKey: "modules.docs.sidebar.i18n.setup", href: "/docs/i18n#setup" },
   {
-    titleKey: "modules.docs.sidebar.i18n.configuration",
-    href: "/docs/i18n#configuration",
+    titleKey: "modules.docs.sidebar.i18n.installation",
+    href: "/docs/i18n#installation",
   },
-  { titleKey: "modules.docs.sidebar.i18n.usage", href: "/docs/i18n#usage" },
+  {
+    titleKey: "modules.docs.sidebar.i18n.fileStructure",
+    href: "/docs/i18n#file-structure",
+  },
+  {
+    titleKey: "modules.docs.sidebar.i18n.serverSetup",
+    href: "/docs/i18n#server-setup",
+  },
+  {
+    titleKey: "modules.docs.sidebar.i18n.useTranslation",
+    href: "/docs/i18n#use-translation",
+  },
+  {
+    titleKey: "modules.docs.sidebar.i18n.languageSwitching",
+    href: "/docs/i18n#language-switching",
+  },
+  {
+    titleKey: "modules.docs.sidebar.i18n.missingTranslations",
+    href: "/docs/i18n#missing-translations",
+  },
+  {
+    titleKey: "modules.docs.sidebar.i18n.serverExports",
+    href: "/docs/i18n#server-exports",
+  },
 ];
 
 const errorLinks: DocLink[] = [
@@ -67,8 +90,66 @@ const errorLinks: DocLink[] = [
     href: "/docs/error-handling#manual-reporting",
   },
   {
+    titleKey: "modules.docs.sidebar.error.errorBoundary",
+    href: "/docs/error-handling#error-boundary",
+  },
+  {
     titleKey: "modules.docs.sidebar.error.viewingErrors",
     href: "/docs/error-handling#viewing-errors",
+  },
+];
+
+const cliLinks: DocLink[] = [
+  {
+    titleKey: "modules.docs.sidebar.cli.overview",
+    href: "/docs/cli#overview",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.installation",
+    href: "/docs/cli#installation",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.init",
+    href: "/docs/cli#init",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.pull",
+    href: "/docs/cli#pull",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.push",
+    href: "/docs/cli#push",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.status",
+    href: "/docs/cli#status",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.environment",
+    href: "/docs/cli#environment",
+  },
+  {
+    titleKey: "modules.docs.sidebar.cli.automation",
+    href: "/docs/cli#automation",
+  },
+];
+
+const listsLinks: DocLink[] = [
+  {
+    titleKey: "modules.docs.sidebar.lists.overview",
+    href: "/docs/lists#overview",
+  },
+  {
+    titleKey: "modules.docs.sidebar.lists.getAllLists",
+    href: "/docs/lists#get-all-lists",
+  },
+  {
+    titleKey: "modules.docs.sidebar.lists.getBySlug",
+    href: "/docs/lists#get-by-slug",
+  },
+  {
+    titleKey: "modules.docs.sidebar.lists.responseTypes",
+    href: "/docs/lists#response-types",
   },
 ];
 
@@ -79,6 +160,8 @@ export function DocSidebar() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     i18n: pathname.startsWith("/docs/i18n"),
     error: pathname.startsWith("/docs/error-handling"),
+    cli: pathname.startsWith("/docs/cli"),
+    lists: pathname.startsWith("/docs/lists"),
   });
 
   useEffect(() => {
@@ -129,6 +212,20 @@ export function DocSidebar() {
       icon: AlertTriangle,
       basePath: "/docs/error-handling",
       links: errorLinks,
+    },
+    {
+      id: "cli",
+      titleKey: "modules.docs.sidebar.cliModule",
+      icon: Terminal,
+      basePath: "/docs/cli",
+      links: cliLinks,
+    },
+    {
+      id: "lists",
+      titleKey: "modules.docs.sidebar.listsModule",
+      icon: List,
+      basePath: "/docs/lists",
+      links: listsLinks,
     },
   ];
 

@@ -1,10 +1,14 @@
 "use client";
 
 import LanguageSwitcher from "@/src/components/language-switcher";
-import { useTranslation } from "@webtools/client";
+import { useTranslation, useLists, useList } from "@webtools/client";
 
 export default function Home() {
   const { t } = useTranslation("common");
+  const lists = useLists();
+  const list = useList("asdasd");
+  console.log("list", list);
+  console.log("lists", lists);
 
   const triggerError = () => {
     throw new Error("Test error from hermes");
@@ -25,6 +29,9 @@ export default function Home() {
         >
           {t("triggerError")}
         </button>
+        <p className="mb-6 text-zinc-500">
+          {t("test", { name: "John", day: "Monday", month: "January" })}
+        </p>
       </div>
     </div>
   );

@@ -30,6 +30,7 @@
     "@types/react": "^19.0.0",
     "@webtools/error-kit": "file:../@webtools:error-kit",
     "@webtools/i18n": "file:../@webtools:i18n",
+    "@webtools/lists": "file:../@webtools:lists",
     "react": "^19.0.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"

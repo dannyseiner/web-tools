@@ -1,5 +1,6 @@
 {
   "greeting": "Ahoj",
   "welcome": "Vítejte ve Web Tools",
-  "triggerError": "Vyvolat chybu"
+  "triggerError": "Vyvolat chybu",
+  "test": "Ahoj {name}, jak se mas? Dneska je {day} a {month}"
 }

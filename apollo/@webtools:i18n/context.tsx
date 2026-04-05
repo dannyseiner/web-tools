@@ -61,6 +61,15 @@ export function I18nProvider({
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+type InterpolationValues = Record<string, string | number>;
+
+function interpolate(template: string, values: InterpolationValues): string {
+  return template.replace(/\{(\w+)\}/g, (match, key) => {
+    if (key in values) return String(values[key]);
+    return match;
+  });
+}
+
 function resolve(obj: unknown, path: string): string | null {
   const keys = path.split(".");
   let current: unknown = obj;
@@ -120,7 +129,7 @@ function changeLocale(newLocale: string) {
 }
 
 export type UseTranslationReturn = {
-  t: (key: string) => string;
+  t: (key: string, values?: InterpolationValues) => string;
   locale: string;
   changeLocale: (newLocale: string) => void;
 };
@@ -135,11 +144,13 @@ export function useTranslation(prefix?: string): UseTranslationReturn {
   const reportedKeys = useRef<Set<string>>(new Set());
 
   const t = useCallback(
-    (key: string): string => {
+    (key: string, values?: InterpolationValues): string => {
       const fullKey = prefix ? `${prefix}.${key}` : key;
       const value = resolve(ctx.messages, fullKey);
 
-      if (value !== null) return value;
+      if (value !== null) {
+        return values ? interpolate(value, values) : value;
+      }
 
       if (!reportedKeys.current.has(fullKey)) {
         reportedKeys.current.add(fullKey);
@@ -167,3 +178,4 @@ export function useTranslation(prefix?: string): UseTranslationReturn {
 }
 
 export { COOKIE_NAME };
+export type { InterpolationValues };

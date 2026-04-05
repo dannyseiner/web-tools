@@ -7,7 +7,7 @@ export default defineConfig([
     dts: true,
     outDir: "dist",
     external: ["react", "react-dom"],
-    noExternal: ["@webtools/error-kit", "@webtools/i18n"],
+    noExternal: ["@webtools/error-kit", "@webtools/i18n", "@webtools/lists"],
     banner: {
       js: '"use client";',
     },
@@ -18,6 +18,6 @@ export default defineConfig([
     dts: true,
     outDir: "dist",
     external: ["react", "fs", "path"],
-    noExternal: ["@webtools/error-kit", "@webtools/i18n"],
+    noExternal: ["@webtools/error-kit", "@webtools/i18n", "@webtools/lists"],
   },
 ]);
