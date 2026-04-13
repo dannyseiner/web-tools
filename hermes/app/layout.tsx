@@ -27,7 +27,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const locale = cookieStore.get(LOCALE_COOKIE_NAME)?.value ?? "en";
+  const locale = cookieStore.get(LOCALE_COOKIE_NAME)?.value ?? "cs";
   const messages = await loadMessages(
     locale,
     path.join(process.cwd(), "messages"),

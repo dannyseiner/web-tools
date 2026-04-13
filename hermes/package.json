@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npx @uu-webtools/cli pull",
+    "prebuild": "npx @uu-webtools/cli pull",
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@webtools/client": "file:../apollo/@webtools:client",
+    "@uu-webtools/cli": "^1.0.0",
+    "@webtools/client": "npm:@uu-webtools/client@^1.2.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"

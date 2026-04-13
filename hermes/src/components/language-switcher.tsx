@@ -3,7 +3,6 @@ import React from "react";
 
 const LanguageSwitcher = () => {
   const { locale, changeLocale } = useTranslation();
-  console.log("locale", locale);
   return (
     <div>
       <select value={locale} onChange={(e) => changeLocale(e.target.value)}>
