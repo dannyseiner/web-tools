@@ -3,6 +3,12 @@
 import LanguageSwitcher from "@/src/components/language-switcher";
 import { useTranslation, useList } from "@webtools/client";
 
+type ListItem = {
+  _id: string;
+  values: Record<string, unknown>;
+  order: number;
+};
+
 export default function Home() {
   const { t, locale } = useTranslation("common.common");
   const { list, loading, error } = useList("team");
@@ -228,7 +234,7 @@ export default function Home() {
 
           {list && (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {list.items.map((member) => (
+              {list.items.map((member: ListItem) => (
                 <div
                   key={member._id}
                   className="group rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow-md"
@@ -307,7 +313,7 @@ export default function Home() {
 
           {subscriptions && (
             <div className="grid gap-6 sm:grid-cols-3">
-              {subscriptions.items.map((plan, index) => {
+              {subscriptions.items.map((plan: ListItem, index: number) => {
                 const isMiddle = index === 1;
                 return (
                   <div

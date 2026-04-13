@@ -1,6 +1,12 @@
 {
+  "age": "",
   "common": {
     "age": "Věk: {age}",
+    "common": {
+      "common": {
+        "heroTitle": ""
+      }
+    },
     "currentLocale": "Aktuální jazyk: {locale}",
     "errorDemoDesc": "Klikněte na tlačítko níže pro simulaci chyby. Chyba bude zachycena a nahlášena.",
     "errorDemoTitle": "Ukázka sledování chyb",
@@ -47,5 +53,45 @@
     "triggerError": "Vyvolat chybu",
     "viewProfile": "Zobrazit profil",
     "welcome": "Vítejte ve Web Tools"
-  }
+  },
+  "currentLocale": "",
+  "errorDemoDesc": "",
+  "errorDemoTitle": "",
+  "featureErrors": "",
+  "featureErrorsDesc": "",
+  "featureI18n": "",
+  "featureI18nDesc": "",
+  "featureLists": "",
+  "featureListsDesc": "",
+  "featuresTitle": "",
+  "footerText": "",
+  "heroDescription": "",
+  "heroSubtitle": "",
+  "interpolationDemo": "",
+  "interpolationResult": "",
+  "loading": "",
+  "noProfile": "",
+  "packagesSubtitle": "",
+  "packagesTitle": "",
+  "pkgCliDesc": "",
+  "pkgCliName": "",
+  "pkgClientDesc": "",
+  "pkgClientName": "",
+  "pkgErrorKitDesc": "",
+  "pkgErrorKitName": "",
+  "pkgI18nDesc": "",
+  "pkgI18nName": "",
+  "pkgInstall": "",
+  "pkgListsDesc": "",
+  "pkgListsName": "",
+  "pkgUsage": "",
+  "pricingCurrency": "",
+  "pricingPeriod": "",
+  "pricingSelect": "",
+  "pricingSubtitle": "",
+  "pricingTitle": "",
+  "teamSubtitle": "",
+  "teamTitle": "",
+  "triggerError": "",
+  "viewProfile": ""
 }
