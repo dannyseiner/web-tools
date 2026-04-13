@@ -10,7 +10,7 @@ type ListItem = {
 };
 
 export default function Home() {
-  const { t, locale } = useTranslation("common.common");
+  const { t, locale } = useTranslation("common");
   const { list, loading, error } = useList("team");
   const {
     list: subscriptions,
