@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 "use client";
 
 import LanguageSwitcher from "@/src/components/language-switcher";
@@ -10,7 +12,7 @@ type ListItem = {
 };
 
 export default function Home() {
-  const { t, locale } = useTranslation("common.common");
+  const { t, locale } = useTranslation("common");
   const { list, loading, error } = useList("team");
   const {
     list: subscriptions,
@@ -18,8 +20,166 @@ export default function Home() {
     error: subscriptionsError,
   } = useList("subscription-plan");
 
-  const triggerError = () => {
-    throw new Error("Test error from hermes");
+  const triggerError = async () => {
+    const syncErrors = [
+      () => {
+        const obj = null as unknown as { nonExistentProperty: { deeplyNested: string } };
+        return obj.nonExistentProperty.deeplyNested;
+      },
+      () => {
+        const undefinedVar = undefined as unknown as { foo: () => void };
+        return undefinedVar.foo();
+      },
+      () => {
+        const fn = "not a function" as unknown as () => void;
+        fn();
+      },
+      () => {
+        JSON.parse("{invalid json,,}");
+      },
+      () => {
+        decodeURIComponent("%E0%A4%A");
+      },
+      () => {
+        encodeURI("\uD800");
+      },
+      () => {
+        const circular: Record<string, unknown> = {};
+        circular.self = circular;
+        JSON.stringify(circular);
+      },
+      () => {
+        const recurse = (): number => recurse() + 1;
+        recurse();
+      },
+      () => {
+        const arr: number[] = [];
+        Object.defineProperty(arr, "length", { writable: false });
+        arr.push(1);
+      },
+      () => {
+        const frozen = Object.freeze({ x: 1 });
+        (frozen as { x: number }).x = 2;
+      },
+      () => {
+        new Array(-1);
+      },
+      () => {
+        (1.23).toFixed(200);
+      },
+      () => {
+        return Symbol("test") + "";
+      },
+      () => {
+        const bigint = 10n;
+        return bigint + (5 as unknown as bigint);
+      },
+      () => {
+        const map = new WeakMap();
+        map.set("not an object" as unknown as object, 1);
+      },
+      () => {
+        Reflect.construct(Math.floor as unknown as new () => object, []);
+      },
+      () => {
+        const proto = Object.create(null);
+        proto.toString();
+      },
+      () => {
+        const arr = [1, 2, 3] as unknown as { flat: (depth: number) => number[] };
+        arr.flat(-Infinity);
+      },
+    ];
+
+    const asyncErrors = [
+      async () => {
+        const res = await fetch(`https://this-domain-definitely-does-not-exist-${Math.random().toString(36).slice(2)}.invalid/api/data`);
+        return res.json();
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/500");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/404");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/401");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/403");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/429");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const res = await fetch("https://httpstat.us/503");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+      },
+      async () => {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 50);
+        await fetch("https://httpstat.us/200?sleep=5000", { signal: controller.signal });
+      },
+      async () => {
+        await fetch("not-a-valid-url");
+      },
+      async () => {
+        await fetch("http://localhost:1/api/nothing");
+      },
+      async () => {
+        const res = await fetch("https://www.google.com/");
+        return res.json();
+      },
+      async () => {
+        await fetch("ftp://example.com/file");
+      },
+      async () => {
+        await fetch("https://jsonplaceholder.typicode.com/posts", {
+          method: "POST",
+          body: JSON.stringify({ foo: () => "cannot serialize" }),
+        });
+      },
+      async () => {
+        await import(`./non-existent-module-${Math.random()}`);
+      },
+      async () => {
+        await Promise.reject(new Error(`Unhandled rejection at ${new Date().toISOString()}`));
+      },
+      async () => {
+        const img = new Image();
+        await new Promise((_, reject) => {
+          img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+          img.src = `https://broken-image-${Math.random()}.invalid/image.png`;
+        });
+      },
+      async () => {
+        const ws = new WebSocket(`wss://nonexistent-${Math.random().toString(36).slice(2)}.invalid`);
+        await new Promise((_, reject) => {
+          ws.onerror = () => reject(new Error(`WebSocket failed to connect to ${ws.url}`));
+          ws.onclose = (e) => reject(new Error(`WebSocket closed (code ${e.code})`));
+        });
+      },
+      async () => {
+        localStorage.setItem("overflow", "x".repeat(50_000_000));
+      },
+      async () => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const req = indexedDB.open("__missing_db__", 999);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        db.transaction("nonexistentStore", "readonly");
+      },
+    ];
+
+    const allErrors = [...syncErrors, ...asyncErrors];
+    const pick = allErrors[Math.floor(Math.random() * allErrors.length)];
+    await pick();
   };
 
   return (

@@ -75,12 +75,12 @@ export function EmployeesSection({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => router.push(`/organizations/${organizationId}/members`)}
-          className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
+          className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors self-start"
         >
           {t("components.employeesSection.viewAllMembers")}
           <ArrowRight className="h-4 w-4" />
@@ -90,7 +90,7 @@ export function EmployeesSection({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setInviteModalOpen(true)}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
           >
             <Mail className="h-4 w-4" />
             {t("components.employeesSection.inviteMembers")}
@@ -98,7 +98,7 @@ export function EmployeesSection({
         )}
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-6">
+      <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
         <h3 className="text-lg font-semibold mb-4">{t("components.employeesSection.teamMembers")}</h3>
 
         {members === undefined ? (
@@ -121,31 +121,31 @@ export function EmployeesSection({
                 key={member._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   {member.user?.image ? (
                     <Image
                       src={member.user.image}
                       alt={member.user.name}
                       width={40}
                       height={40}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <User className="h-5 w-5 text-primary" />
                     </div>
                   )}
-                  <div>
-                    <p className="font-medium">{member.user?.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{member.user?.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">
                       {member.user?.email}
                     </p>
                   </div>
                 </div>
                 <div
-                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium ${getRoleBadgeClass(member.role)}`}
+                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium whitespace-nowrap self-start sm:self-auto shrink-0 ${getRoleBadgeClass(member.role)}`}
                 >
                   {getRoleIcon(member.role)}
                   <span>{member.role}</span>
@@ -157,7 +157,7 @@ export function EmployeesSection({
       </div>
 
       {isAdmin && (
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
           <h3 className="text-lg font-semibold mb-4">{t("components.employeesSection.pendingInvitations")}</h3>
 
           {invites === undefined ? (
@@ -180,23 +180,23 @@ export function EmployeesSection({
                   key={invite._id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <Mail className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">{invite.email}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{invite.email}</p>
                       <p className="text-sm text-muted-foreground">
                         {t("components.employeesSection.invitedOn")}{" "}
                         {new Date(invite._creationTime).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-end shrink-0">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(invite.status)}`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusBadge(invite.status)}`}
                     >
                       {t(`components.employeesSection.status.${invite.status}`)}
                     </span>

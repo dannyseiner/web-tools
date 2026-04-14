@@ -192,7 +192,7 @@ function ProjectDetailPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
       {/* Back Button */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
@@ -214,28 +214,28 @@ function ProjectDetailPage() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="bg-card border border-border rounded-xl overflow-hidden"
       >
-        <div className="p-8">
-          <div className="flex items-start gap-6">
+        <div className="p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
             {project.image ? (
               <Image
                 src={project.image}
                 alt={project.name}
                 width={96}
                 height={96}
-                className="w-24 h-24 rounded-2xl object-cover border-4 border-background shadow-xl"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-background shadow-xl shrink-0"
               />
             ) : (
-              <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl border-4 border-background">
-                <FolderKanban className="h-12 w-12 text-white" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl border-4 border-background shrink-0">
+                <FolderKanban className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
               </div>
             )}
 
-            <div className="flex-1 -mt-2">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+            <div className="flex-1 min-w-0 sm:-mt-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 wrap-break-word">
                 {project.name}
               </h1>
               {project.description ? (
-                <p className="text-muted-foreground leading-relaxed mb-4">
+                <p className="text-muted-foreground leading-relaxed mb-4 wrap-break-word">
                   {project.description}
                 </p>
               ) : (
@@ -244,23 +244,23 @@ function ProjectDetailPage() {
                 </p>
               )}
 
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-x-6 sm:gap-y-2 text-sm">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground shrink-0">
                     {t("pages.projectDetail.created")}
                   </span>
-                  <span className="font-medium text-foreground">
+                  <span className="font-medium text-foreground truncate">
                     {new Date(project._creationTime).toLocaleDateString()}
                   </span>
                 </div>
                 {organization && (
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-muted-foreground shrink-0">
                       {t("pages.projectDetail.organization")}
                     </span>
-                    <span className="font-medium text-foreground">
+                    <span className="font-medium text-foreground truncate">
                       {organization.name}
                     </span>
                   </div>

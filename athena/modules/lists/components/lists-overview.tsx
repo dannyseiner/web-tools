@@ -57,11 +57,22 @@ export function ListsOverview({ projectId }: ListsOverviewProps) {
 
   if (currentList) {
     return (
-      <ListDetail
-        list={currentList}
-        onBack={() => setSelectedList(null)}
-        onEdit={handleEditFromDetail}
-      />
+      <>
+        <ListDetail
+          list={currentList}
+          onBack={() => setSelectedList(null)}
+          onEdit={handleEditFromDetail}
+        />
+        <CreateListDialog
+          projectId={projectId}
+          open={createDialogOpen}
+          onOpenChange={(open) => {
+            setCreateDialogOpen(open);
+            if (!open) setEditingList(null);
+          }}
+          editList={editingList}
+        />
+      </>
     );
   }
 

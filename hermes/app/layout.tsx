@@ -4,7 +4,11 @@ import { loadMessages, LOCALE_COOKIE_NAME } from "@webtools/client/server";
 import path from "path";
 import { cookies } from "next/headers";
 import "./globals.css";
-import { I18nProvider, NextErrorProvider } from "@webtools/client";
+import {
+  ErrorBoundary,
+  I18nProvider,
+  NextErrorProvider,
+} from "@webtools/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,21 +32,25 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const locale = cookieStore.get(LOCALE_COOKIE_NAME)?.value ?? "cs";
-  const messages = await loadMessages(
-    locale,
-    path.join(process.cwd(), "messages"),
-  );
+  const raw = await loadMessages(locale, path.join(process.cwd(), "messages"));
+  const messages: Record<string, unknown> = {};
+  for (const [ns, content] of Object.entries(raw)) {
+    const inner = content as Record<string, unknown>;
+    messages[ns] = inner[ns] ?? inner;
+  }
 
   return (
     <NextErrorProvider>
       <I18nProvider locale={locale} messages={messages}>
-        <html lang={locale}>
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-            {children}
-          </body>
-        </html>
+        <ErrorBoundary>
+          <html lang={locale}>
+            <body
+              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+              {children}
+            </body>
+          </html>
+        </ErrorBoundary>
       </I18nProvider>
     </NextErrorProvider>
   );

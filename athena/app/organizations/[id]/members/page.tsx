@@ -150,7 +150,7 @@ function OrganizationMembersPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -168,17 +168,17 @@ function OrganizationMembersPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-            <Users className="h-8 w-8 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shrink-0">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">
               {t("pages.members.title")}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground truncate">
               {t("pages.members.subtitle", { organizationName: organization.name })}
             </p>
           </div>
@@ -188,7 +188,7 @@ function OrganizationMembersPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setInviteModalOpen(true)}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
           >
             <Mail className="h-5 w-5" />
             {t("pages.members.inviteMembers")}
@@ -200,12 +200,12 @@ function OrganizationMembersPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-card border border-border rounded-xl p-6"
+        className="bg-card border border-border rounded-xl p-4 sm:p-6"
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Shield className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-bold text-foreground">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+            <h2 className="text-lg sm:text-xl font-bold text-foreground truncate">
               {t("pages.members.activeMembers", { count: members.length })}
             </h2>
           </div>
@@ -232,27 +232,27 @@ function OrganizationMembersPage() {
                 key={member._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
               >
-                <div className="flex items-center gap-4 flex-1">
+                <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                   {member.user?.image ? (
                     <Image
                       src={member.user.image}
                       alt={member.user.name}
                       width={48}
                       height={48}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-border"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-border shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-purple-600 flex items-center justify-center">
-                      <User className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shrink-0">
+                      <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">
+                    <p className="font-semibold text-foreground truncate">
                       {member.user?.name}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground truncate">
                       {member.user?.email}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -262,7 +262,7 @@ function OrganizationMembersPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 justify-end shrink-0">
                   {isAdmin ? (
                     <Select
                       value={member.role}
@@ -302,7 +302,7 @@ function OrganizationMembersPage() {
                     </Select>
                   ) : (
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium ${getRoleBadgeClass(member.role)}`}
+                      className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border text-xs sm:text-sm font-medium whitespace-nowrap ${getRoleBadgeClass(member.role)}`}
                     >
                       {getRoleIcon(member.role)}
                       <span>{member.role}</span>
@@ -332,11 +332,11 @@ function OrganizationMembersPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-card border border-border rounded-xl p-6"
+          className="bg-card border border-border rounded-xl p-4 sm:p-6"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <UserCog className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-bold text-foreground">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <UserCog className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+            <h2 className="text-lg sm:text-xl font-bold text-foreground truncate">
               {t("components.employeesSection.pendingInvitations")}
             </h2>
           </div>
@@ -361,23 +361,23 @@ function OrganizationMembersPage() {
                   key={invite._id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <Mail className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">{invite.email}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{invite.email}</p>
                       <p className="text-sm text-muted-foreground">
                         {t("components.employeesSection.invitedOn")}{" "}
                         {new Date(invite._creationTime).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-end shrink-0">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(invite.status)}`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusBadge(invite.status)}`}
                     >
                       {t(`components.employeesSection.status.${invite.status}`)}
                     </span>
