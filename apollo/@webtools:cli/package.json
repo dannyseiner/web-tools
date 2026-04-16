@@ -10,7 +10,16 @@
     "src"
   ],
   "scripts": {
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "node ./node_modules/vitest/vitest.mjs run",
+    "test:all": "rm -f tests/performance-data.jsonl && WEBTOOLS_TEST_TOKEN=test node ./node_modules/vitest/vitest.mjs run && node tests/format-report.js",
+    "test:watch": "node ./node_modules/vitest/vitest.mjs",
+    "test:backend": "node ./node_modules/vitest/vitest.mjs run tests/backend.test.js",
+    "test:roundtrip": "node ./node_modules/vitest/vitest.mjs run tests/backend-roundtrip.test.js",
+    "test:bulk": "node ./node_modules/vitest/vitest.mjs run tests/backend-bulk.test.js",
+    "test:lists": "node ./node_modules/vitest/vitest.mjs run tests/backend-lists.test.js",
+    "test:languages": "node ./node_modules/vitest/vitest.mjs run tests/backend-languages.test.js",
+    "test:cli": "node ./node_modules/vitest/vitest.mjs run tests/cli.test.js",
+    "test:speed": "node ./node_modules/vitest/vitest.mjs run tests/cli-speed.test.js"
   },
   "keywords": [
     "webtools",
@@ -21,5 +30,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9"
   }
 }
