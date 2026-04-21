@@ -9,7 +9,7 @@ import {
   BarChart3,
   FileText,
   Calendar,
-  MessageSquare,
+  Book,
   Languages,
   Building2,
   Bug,
@@ -135,11 +135,6 @@ export const ProjectLayout = ({
       href: `/organizations/${orgId}/projects/${projectId}/lists`,
     },
     {
-      icon: BarChart3,
-      label: t("components.projectLayout.reports"),
-      href: `/organizations/${orgId}/projects/${projectId}/reports`,
-    },
-    {
       icon: Settings,
       label: t("components.projectLayout.settings"),
       href: `/organizations/${orgId}/projects/${projectId}/settings`,
@@ -148,14 +143,14 @@ export const ProjectLayout = ({
 
   const navbarButtonMenus: NavButtonType[] = [
     {
+      className: "bg-primary hover:bg-primary/90 text-primary-foreground",
+      onClick: () => router.push("/docs"),
       children: (
         <>
-          <MessageSquare className="mr-2 h-4 w-4" />
-          {t("components.projectLayout.support")}
+          <Book className="mr-2 h-4 w-4" />
+          {t("nav.docs")}
         </>
       ),
-      variant: "outline",
-      className: "border-border hover:bg-secondary",
     },
   ];
 

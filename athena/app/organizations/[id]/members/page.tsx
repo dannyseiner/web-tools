@@ -41,6 +41,8 @@ function OrganizationMembersPage() {
     organizationId,
   });
 
+  const currentUser = useQuery(api.profile.getProfile);
+
   const members = useQuery(api.organizations.getOrganizationMembers, {
     organizationId,
   });
@@ -54,6 +56,8 @@ function OrganizationMembersPage() {
   const deleteInvite = useMutation(api.invitations.deleteInvite);
 
   const isAdmin = organization?.userRole === "Admin";
+  const canInvite =
+    organization?.userRole === "Admin" || organization?.userRole === "Manager";
 
   const handleRoleChange = async (
     memberId: Id<"organizationMembers">,
@@ -183,7 +187,7 @@ function OrganizationMembersPage() {
             </p>
           </div>
         </div>
-        {isAdmin && (
+        {canInvite && (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -263,7 +267,7 @@ function OrganizationMembersPage() {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 justify-end shrink-0">
-                  {isAdmin ? (
+                  {isAdmin && member.user?._id !== currentUser?._id ? (
                     <Select
                       value={member.role}
                       onValueChange={(value) =>
@@ -274,10 +278,7 @@ function OrganizationMembersPage() {
                       }
                     >
                       <SelectTrigger className="w-32">
-                        <div className="flex items-center gap-2">
-                          {getRoleIcon(member.role)}
-                          <SelectValue />
-                        </div>
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Member">
@@ -309,7 +310,7 @@ function OrganizationMembersPage() {
                     </div>
                   )}
 
-                  {isAdmin && (
+                  {isAdmin && member.user?._id !== currentUser?._id && (
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -327,7 +328,7 @@ function OrganizationMembersPage() {
         )}
       </motion.div>
 
-      {isAdmin && (
+      {canInvite && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

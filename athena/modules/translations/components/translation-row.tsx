@@ -4,9 +4,18 @@ import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { Edit2, Save, X, User, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Edit2,
+  Save,
+  X,
+  User,
+  AlertTriangle,
+  Loader2,
+  History,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
+import { TranslationHistoryModal } from "./translation-history-modal";
 
 interface TranslationRowProps {
   translation: {
@@ -40,6 +49,7 @@ export function TranslationRow({
   const [description, setDescription] = useState(translation.description || "");
   const [quickValue, setQuickValue] = useState("");
   const [isSavingQuick, setIsSavingQuick] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const upsert = useMutation(api.translations.upsertTranslation);
   const startEditing = useMutation(api.translationEditors.startEditing);
@@ -167,12 +177,22 @@ export function TranslationRow({
             )}
           </div>
           {!isEditing && !externallyEditing && (
-            <button
-              onClick={handleStartEdit}
-              className="p-2 hover:bg-accent rounded transition-colors"
-            >
-              <Edit2 className="h-4 w-4 text-muted-foreground" />
-            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={handleStartEdit}
+                className="p-2 hover:bg-accent rounded transition-colors"
+                title={t("common.edit")}
+              >
+                <Edit2 className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => setHistoryOpen(true)}
+                className="p-2 hover:bg-accent rounded transition-colors"
+                title={t("components.translations.editHistory")}
+              >
+                <History className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
           )}
         </div>
 
@@ -255,6 +275,13 @@ export function TranslationRow({
           </p>
         )}
       </div>
+
+      <TranslationHistoryModal
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        translationId={translation._id}
+        translationKey={translation.key}
+      />
     </motion.div>
   );
 }

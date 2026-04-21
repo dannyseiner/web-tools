@@ -25,14 +25,21 @@ import { useTranslations } from "next-intl";
 function ProjectSettingsPage() {
   const params = useParams();
   const projectId = params.projectId as Id<"projects">;
+  const organizationId = params.id as Id<"organizations">;
   const t = useTranslations("pages.projectSettings");
 
   const project = useQuery(api.projects.getProject, { projectId });
+  const organization = useQuery(api.organizations.getOrganization, {
+    organizationId,
+  });
   const settings = useQuery(api.projectSettings.getProjectSettings, {
     projectId,
   });
   const updateProject = useMutation(api.projects.updateProject);
   const generateToken = useMutation(api.projects.generateApiToken);
+
+  const canManageProject =
+    organization?.userRole === "Admin" || organization?.userRole === "Manager";
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -130,7 +137,8 @@ function ProjectSettingsPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            disabled={!canManageProject}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -142,7 +150,8 @@ function ProjectSettingsPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            disabled={!canManageProject}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -167,49 +176,55 @@ function ProjectSettingsPage() {
                   </div>
                 )}
               </div>
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground">
-                  {t("currentImage")}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setImage("")}
-                  className="text-sm text-destructive hover:underline mt-1"
-                >
-                  {t("removeImage")}
-                </button>
-              </div>
+              {canManageProject && (
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">
+                    {t("currentImage")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setImage("")}
+                    className="text-sm text-destructive hover:underline mt-1"
+                  >
+                    {t("removeImage")}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          <FileUpload
-            accept="image/*"
-            maxSize={2 * 1024 * 1024}
-            maxFiles={1}
-            files={uploadedFiles}
-            onFilesChange={handleFilesChange}
-            label={t("uploadLabel")}
-            showPreview
-          />
+          {canManageProject && (
+            <FileUpload
+              accept="image/*"
+              maxSize={2 * 1024 * 1024}
+              maxFiles={1}
+              files={uploadedFiles}
+              onFilesChange={handleFilesChange}
+              label={t("uploadLabel")}
+              showPreview
+            />
+          )}
         </div>
 
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || !name.trim()}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : saved ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            {saved ? t("saved") : t("saveChanges")}
-          </button>
-        </div>
+        {canManageProject && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving || !name.trim()}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : saved ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {saved ? t("saved") : t("saveChanges")}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       {/* API Token */}
@@ -239,19 +254,21 @@ function ProjectSettingsPage() {
               <p className="text-sm text-muted-foreground mb-3">
                 {t("noToken")}
               </p>
-              <button
-                type="button"
-                onClick={handleGenerateToken}
-                disabled={generating}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-              >
-                {generating ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Key className="h-4 w-4" />
-                )}
-                {t("generateToken")}
-              </button>
+              {canManageProject && (
+                <button
+                  type="button"
+                  onClick={handleGenerateToken}
+                  disabled={generating}
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {generating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Key className="h-4 w-4" />
+                  )}
+                  {t("generateToken")}
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
@@ -294,24 +311,26 @@ function ProjectSettingsPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">
-                  {t("regenerateWarning")}
-                </p>
-                <button
-                  type="button"
-                  onClick={handleGenerateToken}
-                  disabled={generating}
-                  className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 transition-colors"
-                >
-                  {generating ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  )}
-                  {t("regenerate")}
-                </button>
-              </div>
+              {canManageProject && (
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {t("regenerateWarning")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleGenerateToken}
+                    disabled={generating}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 transition-colors"
+                  >
+                    {generating ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    )}
+                    {t("regenerate")}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

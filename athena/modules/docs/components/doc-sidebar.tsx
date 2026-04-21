@@ -15,6 +15,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
 
 interface DocLink {
   titleKey: string;
@@ -80,10 +81,6 @@ const errorLinks: DocLink[] = [
   {
     titleKey: "modules.docs.sidebar.error.basicSetup",
     href: "/docs/error-handling#basic-setup",
-  },
-  {
-    titleKey: "modules.docs.sidebar.error.advancedConfig",
-    href: "/docs/error-handling#advanced-configuration",
   },
   {
     titleKey: "modules.docs.sidebar.error.manualReporting",
@@ -232,6 +229,11 @@ export function DocSidebar() {
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 shrink-0 overflow-y-auto border-r border-border bg-card/50 p-6">
       <h2 className="text-lg font-semibold mb-4">{t("modules.docs.title")}</h2>
+
+      <div className="mb-4">
+        <LanguageSwitcher />
+      </div>
+
       <nav className="space-y-0.5">
         {topLinks.map((link) => {
           const Icon = link.icon;

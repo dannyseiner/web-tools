@@ -46,7 +46,7 @@ export default function ErrorHandlingPage() {
         <CodeBlock
           filename="app/layout.tsx"
           language="typescript"
-          code={`import { NextErrorProvider } from "@uu-webtools/client";
+          code={`import { NextErrorProvider, ErrorBoundary } from "@uu-webtools/client";
 
 export default function RootLayout({
   children,
@@ -57,7 +57,9 @@ export default function RootLayout({
     <html>
       <body>
         <NextErrorProvider>
-          {children}
+          <ErrorBoundary fallback={<p>Something went wrong.</p>}>
+            {children}
+          </ErrorBoundary>
         </NextErrorProvider>
       </body>
     </html>
@@ -70,25 +72,6 @@ export default function RootLayout({
           <li>{t("basicSetupAuto2")}</li>
           <li>{t("basicSetupAuto3")}</li>
         </ul>
-      </DocSection>
-
-      <DocSection title={t("advancedConfig")} id="advanced-configuration">
-        <p>{t("advancedConfigDesc")}</p>
-        <CodeBlock
-          language="typescript"
-          code={`<NextErrorProvider
-  projectToken="your_token"   // Optional — defaults to env
-  dsn="https://custom.api/errors"  // Optional — custom endpoint
-  app="my-app"                // Optional — app identifier
-  env="production"            // Optional — environment tag
-  release="1.2.3"             // Optional — release version
-  tags={{ team: "frontend" }} // Optional — custom tags
-  fallback={<ErrorPage />}    // Optional — fallback UI
->
-  {children}
-</NextErrorProvider>`}
-        />
-        <p className="mt-4">{t("advancedConfigToken")}</p>
       </DocSection>
 
       <DocSection title={t("manualReporting")} id="manual-reporting">

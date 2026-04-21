@@ -100,7 +100,7 @@ function ErrorsPage() {
   const deleteError = useMutation(api.errors.deleteError);
   const deleteDuplicates = useMutation(api.errors.deleteDuplicateErrors);
 
-  const errors = useQuery(api.errors.getReportedErrors, {
+  const errorsQuery = useQuery(api.errors.getReportedErrors, {
     projectId,
     search: debouncedSearch.trim() || undefined,
     errorName: errorName || undefined,
@@ -110,6 +110,13 @@ function ErrorsPage() {
       : undefined,
     limit: 200,
   });
+
+  const lastErrorsRef = useRef<typeof errorsQuery>(undefined);
+  if (errorsQuery !== undefined) {
+    lastErrorsRef.current = errorsQuery;
+  }
+  const errors = errorsQuery ?? lastErrorsRef.current;
+  const isRefetching = errorsQuery === undefined && errors !== undefined;
 
   const uniqueErrorNames = useMemo(() => {
     if (!errors) return [];
@@ -159,8 +166,11 @@ function ErrorsPage() {
               placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-9 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
+            {isRefetching && (
+              <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+            )}
           </div>
           <select
             value={errorName}

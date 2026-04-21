@@ -23,10 +23,7 @@ const getMainNavLinks = (labels: {
 }): Link[] => [
   { icon: Home, label: labels.dashboard, href: "/" },
   { icon: Building2, label: labels.organizations, href: "/organizations" },
-  { icon: BarChart3, label: labels.analytics, href: "/analytics" },
-  { icon: MessageSquare, label: labels.messages, href: "/messages" },
   { icon: CodeXml, label: labels.docs, href: "/docs" },
-  { icon: Settings, label: labels.settings, href: "/settings" },
 ];
 
 export const MainLayout = ({
@@ -40,16 +37,6 @@ export const MainLayout = ({
   const { push } = useRouter();
 
   const navbarButtonMenus: NavButtonType[] = [
-    {
-      variant: "outline",
-      className: "border-border hover:bg-secondary",
-      children: (
-        <>
-          <MessageSquare className="mr-2 h-4 w-4" />
-          {t("nav.support")}
-        </>
-      ),
-    },
     {
       className: "bg-primary hover:bg-primary/90 text-primary-foreground",
       onClick: () => push("/docs"),

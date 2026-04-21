@@ -1,5 +1,6 @@
 "use client";
 
+import { LanguageSwitcher } from "@/modules/core/components/language-switcher";
 import { DocSidebar } from "./doc-sidebar";
 
 interface DocLayoutProps {

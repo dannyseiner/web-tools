@@ -19,8 +19,8 @@ export const sendInvites = mutation({
       )
       .first();
 
-    if (!member || member.role !== "Admin") {
-      throw new Error("Only admins can send invites");
+    if (!member || member.role === "Member") {
+      throw new Error("Only admins and managers can send invites");
     }
 
     const organization = await ctx.db.get(args.organizationId);
@@ -84,7 +84,7 @@ export const getOrganizationInvites = query({
       )
       .first();
 
-    if (!member || member.role !== "Admin") {
+    if (!member || member.role === "Member") {
       return null;
     }
 
@@ -117,8 +117,8 @@ export const deleteInvite = mutation({
       )
       .first();
 
-    if (!member || member.role !== "Admin") {
-      throw new Error("Only admins can delete invites");
+    if (!member || member.role === "Member") {
+      throw new Error("Only admins and managers can delete invites");
     }
 
     await ctx.db.delete(args.inviteId);

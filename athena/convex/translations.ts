@@ -366,6 +366,14 @@ export const getTranslationHistory = query({
       oldValue: v.string(),
       newValue: v.string(),
       changedBy: v.id("users"),
+      changedByUser: v.union(
+        v.object({
+          name: v.union(v.string(), v.null()),
+          email: v.union(v.string(), v.null()),
+          image: v.union(v.string(), v.null()),
+        }),
+        v.null(),
+      ),
     }),
   ),
   handler: async (ctx, args) => {
@@ -400,8 +408,23 @@ export const getTranslationHistory = query({
       .withIndex("by_translation", (q) =>
         q.eq("translationId", args.translationId),
       )
+      .order("desc")
       .collect();
 
-    return history;
+    return await Promise.all(
+      history.map(async (entry) => {
+        const user = await ctx.db.get(entry.changedBy);
+        return {
+          ...entry,
+          changedByUser: user
+            ? {
+                name: user.name ?? null,
+                email: user.email ?? null,
+                image: user.image ?? null,
+              }
+            : null,
+        };
+      }),
+    );
   },
 });

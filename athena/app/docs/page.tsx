@@ -22,6 +22,7 @@ export default function DocsPage() {
           <li>{t("overviewItem1")}</li>
           <li>{t("overviewItem2")}</li>
           <li>{t("overviewItem3")}</li>
+          <li>{t("overviewItemLists")}</li>
           <li>{t("overviewItem4")}</li>
         </ul>
       </DocSection>
@@ -77,6 +78,17 @@ export default function DocsPage() {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </h3>
             <p className="text-sm text-muted-foreground">{t("cliDesc")}</p>
+          </Link>
+
+          <Link
+            href="/docs/lists"
+            className="group p-6 border border-border rounded-lg hover:border-primary transition-colors"
+          >
+            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+              {t("listsTitle")}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </h3>
+            <p className="text-sm text-muted-foreground">{t("listsDesc")}</p>
           </Link>
         </div>
       </DocSection>

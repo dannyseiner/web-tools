@@ -160,6 +160,7 @@ export const getOrganization = query({
         v.union(v.literal("Member"), v.literal("Manager"), v.literal("Admin")),
         v.null(),
       ),
+      isOwner: v.boolean(),
     }),
     v.null(),
   ),
@@ -189,6 +190,7 @@ export const getOrganization = query({
       description: org.description ?? null,
       image: org.image ?? null,
       userRole,
+      isOwner: userId !== null && org.createdBy === userId,
     };
   },
 });
@@ -210,16 +212,13 @@ export const updateOrganization = mutation({
       throw new Error("User must be authenticated");
     }
 
-    // Check if user is an admin of this organization
-    const membership = await ctx.db
-      .query("organizationMembers")
-      .withIndex("by_organizationId_and_userId", (q) =>
-        q.eq("organizationId", args.organizationId).eq("userId", userId),
-      )
-      .first();
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
 
-    if (!membership || membership.role !== "Admin") {
-      throw new Error("Only admins can update organization details");
+    if (org.createdBy !== userId) {
+      throw new Error("Only the organization owner can update these settings");
     }
 
     const updates: Record<string, string | undefined> = {};

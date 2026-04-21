@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  ListTodo,
-  Users,
-  Settings,
-  MessageSquare,
-  Building2,
-} from "lucide-react";
+import { ListTodo, Users, Settings, Book, Building2 } from "lucide-react";
 import { Layout, Link, NavButtonType } from "@/modules/core/components/layout";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -63,6 +57,7 @@ const getOrganizationNavLinks = (
   organizationName: string | null | undefined,
   organizationImage: string | null | undefined,
   isLoading: boolean,
+  isOwner: boolean,
   labels: {
     overview: string;
     projects: string;
@@ -95,11 +90,15 @@ const getOrganizationNavLinks = (
     label: labels.members,
     href: `/organizations/${organizationId}/members`,
   },
-  {
-    icon: Settings,
-    label: labels.settings,
-    href: `/organizations/${organizationId}/settings`,
-  },
+  ...(isOwner
+    ? [
+        {
+          icon: Settings,
+          label: labels.settings,
+          href: `/organizations/${organizationId}/settings`,
+        },
+      ]
+    : []),
 ];
 
 export const OrganizationLayout = ({
@@ -110,6 +109,7 @@ export const OrganizationLayout = ({
   showNotifications?: boolean;
 }) => {
   const params = useParams();
+  const { push } = useRouter();
   const organizationId = params?.id as string;
   const t = useTranslations();
 
@@ -125,13 +125,14 @@ export const OrganizationLayout = ({
 
   const navbarButtonMenus: NavButtonType[] = [
     {
+      className: "bg-primary hover:bg-primary/90 text-primary-foreground",
+      onClick: () => push("/docs"),
       children: (
         <>
-          <MessageSquare className="mr-2 h-4 w-4" />
-          {t("components.organizationLayout.support")}
+          <Book className="mr-2 h-4 w-4" />
+          {t("nav.docs")}
         </>
       ),
-      className: "border-border hover:bg-secondary",
     },
   ];
 
@@ -142,6 +143,7 @@ export const OrganizationLayout = ({
         organization?.name ?? null,
         organization?.image ?? null,
         isLoading,
+        organization?.isOwner ?? false,
         {
           overview: t("components.organizationLayout.overview"),
           projects: t("components.organizationLayout.projects"),

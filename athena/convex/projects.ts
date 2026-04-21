@@ -81,6 +81,46 @@ export const getOrganizationProjects = query({
   },
 });
 
+export const getUserProjects = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) {
+      return [];
+    }
+
+    const memberships = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    const projectsPerOrg = await Promise.all(
+      memberships.map(async (m) => {
+        const org = await ctx.db.get(m.organizationId);
+        const projects = await ctx.db
+          .query("projects")
+          .withIndex("by_organizationId", (q) =>
+            q.eq("organizationId", m.organizationId),
+          )
+          .collect();
+        return projects.map((p) => ({
+          _id: p._id,
+          _creationTime: p._creationTime,
+          organizationId: p.organizationId,
+          organizationName: org?.name ?? null,
+          name: p.name,
+          description: p.description ?? null,
+          image: p.image ?? null,
+        }));
+      }),
+    );
+
+    return projectsPerOrg
+      .flat()
+      .sort((a, b) => b._creationTime - a._creationTime);
+  },
+});
+
 export const getProject = query({
   args: {
     projectId: v.id("projects"),

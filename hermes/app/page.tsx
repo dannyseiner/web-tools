@@ -23,7 +23,9 @@ export default function Home() {
   const triggerError = async () => {
     const syncErrors = [
       () => {
-        const obj = null as unknown as { nonExistentProperty: { deeplyNested: string } };
+        const obj = null as unknown as {
+          nonExistentProperty: { deeplyNested: string };
+        };
         return obj.nonExistentProperty.deeplyNested;
       },
       () => {
@@ -86,44 +88,68 @@ export default function Home() {
         proto.toString();
       },
       () => {
-        const arr = [1, 2, 3] as unknown as { flat: (depth: number) => number[] };
+        const arr = [1, 2, 3] as unknown as {
+          flat: (depth: number) => number[];
+        };
         arr.flat(-Infinity);
       },
     ];
 
     const asyncErrors = [
       async () => {
-        const res = await fetch(`https://this-domain-definitely-does-not-exist-${Math.random().toString(36).slice(2)}.invalid/api/data`);
+        const res = await fetch(
+          `https://this-domain-definitely-does-not-exist-${Math.random().toString(36).slice(2)}.invalid/api/data`,
+        );
         return res.json();
       },
       async () => {
         const res = await fetch("https://httpstat.us/500");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const res = await fetch("https://httpstat.us/404");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const res = await fetch("https://httpstat.us/401");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const res = await fetch("https://httpstat.us/403");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const res = await fetch("https://httpstat.us/429");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const res = await fetch("https://httpstat.us/503");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText} from ${res.url}`);
+        if (!res.ok)
+          throw new Error(
+            `HTTP ${res.status}: ${res.statusText} from ${res.url}`,
+          );
       },
       async () => {
         const controller = new AbortController();
         setTimeout(() => controller.abort(), 50);
-        await fetch("https://httpstat.us/200?sleep=5000", { signal: controller.signal });
+        await fetch("https://httpstat.us/200?sleep=5000", {
+          signal: controller.signal,
+        });
       },
       async () => {
         await fetch("not-a-valid-url");
@@ -148,20 +174,27 @@ export default function Home() {
         await import(`./non-existent-module-${Math.random()}`);
       },
       async () => {
-        await Promise.reject(new Error(`Unhandled rejection at ${new Date().toISOString()}`));
+        await Promise.reject(
+          new Error(`Unhandled rejection at ${new Date().toISOString()}`),
+        );
       },
       async () => {
         const img = new Image();
         await new Promise((_, reject) => {
-          img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+          img.onerror = () =>
+            reject(new Error(`Failed to load image: ${img.src}`));
           img.src = `https://broken-image-${Math.random()}.invalid/image.png`;
         });
       },
       async () => {
-        const ws = new WebSocket(`wss://nonexistent-${Math.random().toString(36).slice(2)}.invalid`);
+        const ws = new WebSocket(
+          `wss://nonexistent-${Math.random().toString(36).slice(2)}.invalid`,
+        );
         await new Promise((_, reject) => {
-          ws.onerror = () => reject(new Error(`WebSocket failed to connect to ${ws.url}`));
-          ws.onclose = (e) => reject(new Error(`WebSocket closed (code ${e.code})`));
+          ws.onerror = () =>
+            reject(new Error(`WebSocket failed to connect to ${ws.url}`));
+          ws.onclose = (e) =>
+            reject(new Error(`WebSocket closed (code ${e.code})`));
         });
       },
       async () => {

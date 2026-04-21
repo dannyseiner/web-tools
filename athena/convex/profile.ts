@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const getProfile = query({
@@ -34,5 +34,29 @@ export const getProfile = query({
       email: user.email ?? null,
       image: user.image ?? null,
     };
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    name: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) {
+      throw new Error("User must be authenticated");
+    }
+
+    const name = args.name.trim();
+    if (name.length < 1) {
+      throw new Error("Name is required");
+    }
+    if (name.length > 100) {
+      throw new Error("Name must be less than 100 characters");
+    }
+
+    await ctx.db.patch(userId, { name });
+    return null;
   },
 });
