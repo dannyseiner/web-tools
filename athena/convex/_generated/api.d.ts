@@ -14,7 +14,6 @@ import type * as http from "../http.js";
 import type * as invitations from "../invitations.js";
 import type * as languages from "../languages.js";
 import type * as lists from "../lists.js";
-import type * as myFunctions from "../myFunctions.js";
 import type * as notificationHelpers from "../notificationHelpers.js";
 import type * as notifications from "../notifications.js";
 import type * as organization from "../organization.js";
@@ -46,7 +45,6 @@ declare const fullApi: ApiFromModules<{
   invitations: typeof invitations;
   languages: typeof languages;
   lists: typeof lists;
-  myFunctions: typeof myFunctions;
   notificationHelpers: typeof notificationHelpers;
   notifications: typeof notifications;
   organization: typeof organization;

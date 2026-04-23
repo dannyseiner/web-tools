@@ -3,7 +3,9 @@
 "use client";
 
 import LanguageSwitcher from "@/src/components/language-switcher";
-import { useTranslation, useList } from "@webtools/client";
+import { useSubscriptions } from "@/src/hooks/use-subscriptions";
+import { useTranslation, useList, captureException } from "@webtools/client";
+import { useState } from "react";
 
 type ListItem = {
   _id: string;
@@ -15,10 +17,40 @@ export default function Home() {
   const { t, locale } = useTranslation("common");
   const { list, loading, error } = useList("team");
   const {
-    list: subscriptions,
+    data: subscriptions,
     loading: subscriptionsLoading,
     error: subscriptionsError,
-  } = useList("subscription-plan");
+  } = useSubscriptions();
+  console.log("subscriptions", subscriptions);
+
+  const [customErrorTitle, setCustomErrorTitle] = useState("");
+  const [customErrorStatus, setCustomErrorStatus] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [customErrorSending, setCustomErrorSending] = useState(false);
+
+  const submitCustomError = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCustomErrorStatus(null);
+
+    if (!customErrorTitle.trim()) {
+      setCustomErrorStatus({
+        type: "error",
+        text: t("customErrorTitleRequired"),
+      });
+      return;
+    }
+
+    try {
+      setCustomErrorSending(true);
+      await captureException(new Error(customErrorTitle));
+      setCustomErrorStatus({ type: "success", text: t("customErrorSuccess") });
+      setCustomErrorTitle("");
+    } finally {
+      setCustomErrorSending(false);
+    }
+  };
 
   const triggerError = async () => {
     const syncErrors = [
@@ -219,7 +251,7 @@ export default function Home() {
     <div className="min-h-screen bg-white font-sans text-zinc-900">
       <nav className="fixed top-0 z-50 flex w-full items-center justify-between border-b border-zinc-200 bg-white/80 px-6 py-4 backdrop-blur-md">
         <span className="text-lg font-bold tracking-tight text-orange-500">
-          ⚡ Web Tools
+          Web Tools
         </span>
         <LanguageSwitcher />
       </nav>
@@ -449,7 +481,7 @@ export default function Home() {
                         {member.values.title as string}
                       </h3>
                       <p className="text-sm text-zinc-400">
-                        {t("age", { age: member.values.vek as string })}
+                        {t("age", { age: member.values.age as string })}
                       </p>
                     </div>
                   </div>
@@ -573,6 +605,61 @@ export default function Home() {
           >
             {t("triggerError")}
           </button>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-200 bg-zinc-50 px-6 py-24">
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-3xl font-bold tracking-tight">
+              {t("customErrorTitle")}
+            </h2>
+            <p className="text-sm text-zinc-400">{t("customErrorDesc")}</p>
+          </div>
+
+          <form
+            onSubmit={submitCustomError}
+            className="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+          >
+            <div>
+              <label
+                htmlFor="custom-error-title"
+                className="mb-1 block text-xs font-medium uppercase tracking-wider text-zinc-400"
+              >
+                {t("customErrorTitleLabel")}
+              </label>
+              <input
+                id="custom-error-title"
+                type="text"
+                value={customErrorTitle}
+                onChange={(e) => setCustomErrorTitle(e.target.value)}
+                placeholder={t("customErrorTitlePlaceholder")}
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-100"
+              />
+            </div>
+
+            {customErrorStatus && (
+              <div
+                className={`rounded-lg border px-3 py-2 text-sm ${
+                  customErrorStatus.type === "success"
+                    ? "border-green-200 bg-green-50 text-green-700"
+                    : "border-red-200 bg-red-50 text-red-600"
+                }`}
+              >
+                {customErrorStatus.text}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={customErrorSending}
+              className="w-full rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {customErrorSending
+                ? t("customErrorSending")
+                : t("customErrorSubmit")}
+            </button>
+          </form>
         </div>
       </section>
 

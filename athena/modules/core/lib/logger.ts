@@ -41,7 +41,6 @@ const getCallerFunctionName = (): string => {
 type LogLevel = "log" | "warn" | "error" | "success";
 
 /**
- * ANSI codes for background + text color.
  *  - \x1b[44m = Blue Background
  *  - \x1b[43m = Yellow Background
  *  - \x1b[41m = Red Background

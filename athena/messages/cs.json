@@ -90,12 +90,14 @@
     "loggedInDesc": "Byli jste úspěšně přihlášeni",
     "errorLoggingIn": "Chyba při přihlašování",
     "errorLoggingInDesc": "Při přihlašování došlo k chybě",
+    "invalidCredentials": "Nesprávný e-mail nebo heslo",
     "creatingAccount": "Vytváření účtu",
     "creatingAccountDesc": "Vytváříme váš účet...",
     "accountCreated": "Účet vytvořen",
     "accountCreatedDesc": "Váš účet byl úspěšně vytvořen",
     "errorCreatingAccount": "Chyba při vytváření účtu",
     "errorCreatingAccountDesc": "Při vytváření účtu došlo k chybě",
+    "accountAlreadyExists": "Účet s tímto e-mailem již existuje",
     "signingInWith": "Přihlašování pomocí",
     "redirectingToAuth": "Přesměrování na autentizaci...",
     "errorSigningIn": "Chyba při přihlašování",
@@ -514,6 +516,7 @@
       "allLanguagesAddedDesc": "Přidali jste všechny dostupné jazyky do tohoto projektu",
       "adding": "Přidávání...",
       "searchPlaceholder": "Hledat podle klíče, hodnoty nebo popisu...",
+      "searchTranslationsPlaceholder": "Hledat překlady...",
       "allNamespaces": "Všechny skupiny",
       "noTranslationsYet": "Zatím žádné překlady",
       "tryAdjustingSearch": "Zkuste upravit vyhledávací dotaz",
@@ -575,7 +578,14 @@
       "error": "Chyba",
       "addLanguageToProject": "Přidat nový jazyk pro překlad tohoto projektu",
       "failedToAddLanguage": "Nepodařilo se přidat jazyk",
-      "addTranslationDesc": "Vytvořit nový překladový klíč"
+      "addTranslationDesc": "Vytvořit nový překladový klíč",
+      "languageSetup": {
+        "title": "Nastavení výchozího jazyka",
+        "description": "Zvolte hlavní jazyk pro tento projekt",
+        "settingUp": "Nastavuji...",
+        "continue": "Pokračovat",
+        "failedToSet": "Nepodařilo se nastavit jazyk"
+      }
     },
     "fileUpload": {
       "dragDrop": "Přetáhněte soubor sem",

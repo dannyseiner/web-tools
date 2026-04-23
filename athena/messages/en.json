@@ -90,12 +90,14 @@
     "loggedInDesc": "You have been signed in successfully",
     "errorLoggingIn": "Error signing in",
     "errorLoggingInDesc": "An error occurred while signing in",
+    "invalidCredentials": "Incorrect email or password",
     "creatingAccount": "Creating account",
     "creatingAccountDesc": "Creating your account...",
     "accountCreated": "Account created",
     "accountCreatedDesc": "Your account has been created successfully",
     "errorCreatingAccount": "Error creating account",
     "errorCreatingAccountDesc": "An error occurred while creating your account",
+    "accountAlreadyExists": "An account with this email already exists",
     "signingInWith": "Signing in with",
     "redirectingToAuth": "Redirecting to authentication...",
     "errorSigningIn": "Error signing in",
@@ -514,6 +516,7 @@
       "allLanguagesAddedDesc": "You have added every available language to this project",
       "adding": "Adding...",
       "searchPlaceholder": "Search by key, value, or description...",
+      "searchTranslationsPlaceholder": "Search translations...",
       "allNamespaces": "All namespaces",
       "noTranslationsYet": "No translations yet",
       "tryAdjustingSearch": "Try adjusting your search query",
@@ -575,7 +578,14 @@
       "error": "Error",
       "addLanguageToProject": "Add a new language to translate this project",
       "failedToAddLanguage": "Failed to add language",
-      "addTranslationDesc": "Create a new translation key"
+      "addTranslationDesc": "Create a new translation key",
+      "languageSetup": {
+        "title": "Setup default language",
+        "description": "Choose the primary language for this project",
+        "settingUp": "Setting up...",
+        "continue": "Continue",
+        "failedToSet": "Failed to set language"
+      }
     },
     "fileUpload": {
       "dragDrop": "Drag and drop a file here",

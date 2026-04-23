@@ -12,24 +12,23 @@ interface LocaleProviderProps {
 
 export function LocaleProvider({ children }: LocaleProviderProps) {
   const [locale, setLocale] = useState<Locale>(fallbackLanguage);
-  const [messages, setMessages] = useState<any>(null);
+  const [messages, setMessages] = useState<Record<string, unknown> | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadMessages() {
       try {
-        // Get locale from localStorage
         const storedLocale =
           (localStorage.getItem(LOCALE_STORAGE_KEY) as Locale) ||
           fallbackLanguage;
         setLocale(storedLocale);
 
-        // Dynamically import messages for the locale
         const loadedMessages = await import(`@/messages/${storedLocale}.json`);
         setMessages(loadedMessages.default);
       } catch (error) {
         console.error("Failed to load messages:", error);
-        // Fallback to default locale
         const fallbackMessages = await import(
           `@/messages/${fallbackLanguage}.json`
         );

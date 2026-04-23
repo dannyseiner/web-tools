@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Languages, Loader2, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 
 interface LanguageSetupProps {
   projectId: Id<"projects">;
@@ -13,6 +14,7 @@ interface LanguageSetupProps {
 }
 
 export function LanguageSetup({ projectId, onComplete }: LanguageSetupProps) {
+  const t = useTranslations("components.translations.languageSetup");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +33,7 @@ export function LanguageSetup({ projectId, onComplete }: LanguageSetupProps) {
       onComplete();
     } catch (error) {
       console.error("Error setting default language:", error);
-      alert(error instanceof Error ? error.message : "Failed to set language");
+      alert(error instanceof Error ? error.message : t("failedToSet"));
     } finally {
       setLoading(false);
     }
@@ -58,11 +60,9 @@ export function LanguageSetup({ projectId, onComplete }: LanguageSetupProps) {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground">
-              Setup Default Language
+              {t("title")}
             </h2>
-            <p className="text-muted-foreground">
-              Choose the primary language for this project
-            </p>
+            <p className="text-muted-foreground">{t("description")}</p>
           </div>
         </div>
 
@@ -106,10 +106,10 @@ export function LanguageSetup({ projectId, onComplete }: LanguageSetupProps) {
           {loading ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
-              Setting up...
+              {t("settingUp")}
             </>
           ) : (
-            "Continue"
+            t("continue")
           )}
         </motion.button>
       </motion.div>

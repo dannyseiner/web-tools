@@ -119,7 +119,6 @@ export function FileUpload({
     try {
       const filesToProcess = Array.from(fileList);
 
-      // Check max files limit
       if (files.length + filesToProcess.length > maxFiles) {
         setUploadError(
           `You can only upload up to ${maxFiles} file${maxFiles > 1 ? "s" : ""}`,
@@ -128,7 +127,6 @@ export function FileUpload({
         return;
       }
 
-      // Validate all files first
       for (const file of filesToProcess) {
         const validationError = validateFile(file);
         if (validationError) {
@@ -138,7 +136,6 @@ export function FileUpload({
         }
       }
 
-      // Process files
       const newFiles: UploadedFile[] = await Promise.all(
         filesToProcess.map(async (file) => {
           const base64 = await fileToBase64(file);
@@ -150,7 +147,6 @@ export function FileUpload({
             base64,
           };
 
-          // Generate preview for images
           if (file.type.startsWith("image/") && showPreview) {
             uploadedFile.preview = base64;
           }
@@ -207,7 +203,6 @@ export function FileUpload({
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     processFiles(e.target.files);
-    // Reset input value so the same file can be selected again
     e.target.value = "";
   };
 
@@ -226,7 +221,6 @@ export function FileUpload({
 
   return (
     <div className="space-y-4">
-      {/* Upload Area */}
       <div
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
@@ -291,7 +285,6 @@ export function FileUpload({
         </div>
       </div>
 
-      {/* Error Message */}
       <AnimatePresence>
         {displayError && (
           <motion.div
@@ -305,7 +298,6 @@ export function FileUpload({
         )}
       </AnimatePresence>
 
-      {/* Uploaded Files List */}
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div
@@ -328,7 +320,6 @@ export function FileUpload({
                     exit={{ opacity: 0, x: 20 }}
                     className="flex items-center gap-3 bg-card border border-border rounded-lg p-3 group hover:shadow-md transition-all"
                   >
-                    {/* File Preview or Icon */}
                     {file.preview ? (
                       <img
                         src={file.preview}
@@ -341,7 +332,6 @@ export function FileUpload({
                       </div>
                     )}
 
-                    {/* File Info */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {file.name}
@@ -353,7 +343,6 @@ export function FileUpload({
                       )}
                     </div>
 
-                    {/* Remove Button */}
                     <motion.button
                       type="button"
                       onClick={(e) => {

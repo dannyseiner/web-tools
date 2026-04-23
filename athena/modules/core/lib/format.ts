@@ -1,4 +1,3 @@
-// Helper function to get initials from name or email
 export const getInitials = (
   name?: string | null,
   email?: string | null,

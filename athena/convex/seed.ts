@@ -3,6 +3,8 @@ import { mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 // @AI-GENERATED: just for helping purpose - will be deleted on release
+// - dev -> prod migration
+// - seed inject languages (default languages)
 
 export const migrateProjectsLanguages = mutation({
   args: {},

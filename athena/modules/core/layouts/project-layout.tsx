@@ -2,13 +2,8 @@
 
 import {
   FolderKanban,
-  ListTodo,
   List,
-  Users,
   Settings,
-  BarChart3,
-  FileText,
-  Calendar,
   Book,
   Languages,
   Building2,
@@ -84,7 +79,6 @@ export const ProjectLayout = ({
   const projectId = params?.projectId as string;
   const t = useTranslations();
 
-  // Fetch organization data
   const organization = useQuery(
     api.organizations.getOrganization,
     orgId ? { organizationId: orgId as Id<"organizations"> } : "skip",

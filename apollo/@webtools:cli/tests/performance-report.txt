@@ -1,36 +1,35 @@
 ==============================================================================================================
-  Performance Report — 2026-04-16 11:09:40
+  Performance Report — 2026-04-23 23:16:33
 ==============================================================================================================
 
 Route                                Payload / context               Status  Duration
 -----------------------------------  ------------------------------  ------  ----------
-disk read (build payload)            20 files, 1000 keys             -            10 ms
-disk write (save files)              20 files, 1000 keys             -            14 ms
+disk read (build payload)            20 files, 1000 keys             -             1 ms
+disk write (save files)              20 files, 1000 keys             -             3 ms
 JSON.stringify (payload)             36.5 KB                         -             0 ms
-GET /i18n/languages                  no token                        401         355 ms
-GET /lists                           no token                        401         366 ms
-GET /lists                           no token                        401         386 ms
-POST /i18n/translations              invalid JSON                    400         427 ms
-GET /i18n/translations               no token                        401         256 ms
-POST /i18n/translations              array body                      400         312 ms
-GET /i18n/languages                  no token                        401         161 ms
-GET /lists/[slug]                    no token                        401         172 ms
-GET /i18n/languages                  3 languages                     200         353 ms
-GET /lists                           invalid token                   401         219 ms
-POST /i18n/translations              empty object                    200         200 ms
-POST /i18n/translations              no token, empty body            401         189 ms
-OPTIONS /lists                       preflight                       204         174 ms
-GET /lists                           2 lists                         200         215 ms
-GET /organizations                   public, no token                200         221 ms
-POST /i18n/translations              1 key, 1 language               200         485 ms
-GET /lists/[slug]                    non-existent slug               404         261 ms
-GET /lists/[slug]                    slug="predplatny"               200         403 ms
-GET /lists/test                      7 fields, 1 items               200         260 ms
-GET /i18n/translations               all translations                200        2116 ms
-POST /i18n/translations              1 key update                    200         344 ms
-POST /i18n/translations              133.2 KB (1000 keys, 2 langs)   200        5354 ms  (~187 keys/s)
-GET /i18n/translations               full project (after bulk)       200         447 ms
-POST /i18n/translations              1 key x 2 languages             200         259 ms
+POST /i18n/translations              invalid JSON                    400         438 ms
+GET /i18n/languages                  no token                        401         560 ms
+GET /lists                           no token                        401         571 ms
+GET /lists                           no token                        401         683 ms
+POST /i18n/translations              array body                      400         382 ms
+GET /i18n/translations               no token                        401         339 ms
+GET /i18n/languages                  no token                        401         162 ms
+GET /lists/[slug]                    no token                        401         164 ms
+GET /i18n/languages                  3 languages                     200         249 ms
+POST /i18n/translations              empty object                    200         192 ms
+GET /lists                           invalid token                   401         259 ms
+POST /i18n/translations              no token, empty body            401         152 ms
+OPTIONS /lists                       preflight                       204         240 ms
+GET /lists                           2 lists                         200         290 ms
+POST /i18n/translations              1 key, 1 language               200         340 ms
+GET /lists/[slug]                    non-existent slug               404         210 ms
+GET /lists/[slug]                    slug="predplatny"               200         251 ms
+GET /lists/test                      7 fields, 1 items               200         218 ms
+POST /i18n/translations              133.2 KB (1000 keys, 2 langs)   200        3830 ms  (~261 keys/s)
+GET /i18n/translations               all translations                200        2125 ms
+GET /i18n/translations               full project (after bulk)       200         266 ms
+POST /i18n/translations              1 key update                    200         269 ms
+POST /i18n/translations              1 key x 2 languages             200         283 ms
 
 --------------------------------------------------------------------------------------------------------------
-Total measurements: 27
+Total measurements: 26

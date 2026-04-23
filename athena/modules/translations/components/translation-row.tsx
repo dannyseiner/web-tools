@@ -16,6 +16,7 @@ import {
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { TranslationHistoryModal } from "./translation-history-modal";
+import { toast } from "react-toastify";
 
 interface TranslationRowProps {
   translation: {
@@ -75,7 +76,6 @@ export function TranslationRow({
     setDescription(translation.description || "");
     onStopEdit();
 
-    // Only stop editing if we have a valid translation ID
     if (translation.value) {
       await stopEditing({ translationId: translation._id });
     }
@@ -99,7 +99,7 @@ export function TranslationRow({
       }
     } catch (error) {
       console.error("Error saving translation:", error);
-      alert("Failed to save translation");
+      toast.error(t("components.translations.errorSaving"));
     }
   };
 
@@ -124,7 +124,7 @@ export function TranslationRow({
       setQuickValue("");
     } catch (error) {
       console.error("Error saving translation:", error);
-      alert(t("components.translations.errorSaving"));
+      toast.error(t("components.translations.errorSaving"));
     } finally {
       setIsSavingQuick(false);
     }

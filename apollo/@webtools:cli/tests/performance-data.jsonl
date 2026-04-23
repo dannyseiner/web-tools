@@ -1,27 +1,26 @@
-{"route":"disk read (build payload)","payload":"20 files, 1000 keys","durationMs":10.371458000000018,"status":"-","extra":""}
-{"route":"disk write (save files)","payload":"20 files, 1000 keys","durationMs":14.441416000000004,"status":"-","extra":""}
-{"route":"JSON.stringify (payload)","payload":"36.5 KB","durationMs":0.1272910000000138,"status":"-","extra":""}
-{"route":"GET /i18n/languages","payload":"no token","durationMs":354.889375,"status":401,"extra":""}
-{"route":"GET /lists","payload":"no token","durationMs":365.683417,"status":401,"extra":""}
-{"route":"GET /lists","payload":"no token","durationMs":385.99562499999996,"status":401,"extra":""}
-{"route":"POST /i18n/translations","payload":"invalid JSON","durationMs":426.730833,"status":400,"extra":""}
-{"route":"GET /i18n/translations","payload":"no token","durationMs":256.00966600000004,"status":401,"extra":""}
-{"route":"POST /i18n/translations","payload":"array body","durationMs":311.549542,"status":400,"extra":""}
-{"route":"GET /i18n/languages","payload":"no token","durationMs":161.41787499999998,"status":401,"extra":""}
-{"route":"GET /lists/[slug]","payload":"no token","durationMs":171.91162499999996,"status":401,"extra":""}
-{"route":"GET /i18n/languages","payload":"3 languages","durationMs":353.2907910000001,"status":200,"extra":""}
-{"route":"GET /lists","payload":"invalid token","durationMs":219.49508400000013,"status":401,"extra":""}
-{"route":"POST /i18n/translations","payload":"empty object","durationMs":200.37437499999987,"status":200,"extra":""}
-{"route":"POST /i18n/translations","payload":"no token, empty body","durationMs":188.75716699999998,"status":401,"extra":""}
-{"route":"OPTIONS /lists","payload":"preflight","durationMs":174.3125,"status":204,"extra":""}
-{"route":"GET /lists","payload":"2 lists","durationMs":215.05608299999994,"status":200,"extra":""}
-{"route":"GET /organizations","payload":"public, no token","durationMs":220.84100000000012,"status":200,"extra":""}
-{"route":"POST /i18n/translations","payload":"1 key, 1 language","durationMs":485.33616699999993,"status":200,"extra":""}
-{"route":"GET /lists/[slug]","payload":"non-existent slug","durationMs":261.47891600000025,"status":404,"extra":""}
-{"route":"GET /lists/[slug]","payload":"slug=\"predplatny\"","durationMs":402.7984999999999,"status":200,"extra":""}
-{"route":"GET /lists/test","payload":"7 fields, 1 items","durationMs":260.05512499999986,"status":200,"extra":""}
-{"route":"GET /i18n/translations","payload":"all translations","durationMs":2116.0295,"status":200,"extra":""}
-{"route":"POST /i18n/translations","payload":"1 key update","durationMs":344.3050829999993,"status":200,"extra":""}
-{"route":"POST /i18n/translations","payload":"133.2 KB (1000 keys, 2 langs)","durationMs":5353.749708,"status":200,"extra":"~187 keys/s"}
-{"route":"GET /i18n/translations","payload":"full project (after bulk)","durationMs":446.90770800000064,"status":200,"extra":""}
-{"route":"POST /i18n/translations","payload":"1 key x 2 languages","durationMs":258.6615840000004,"status":200,"extra":""}
+{"route":"disk read (build payload)","payload":"20 files, 1000 keys","durationMs":1.1995410000000106,"status":"-","extra":""}
+{"route":"disk write (save files)","payload":"20 files, 1000 keys","durationMs":3.4385420000000124,"status":"-","extra":""}
+{"route":"JSON.stringify (payload)","payload":"36.5 KB","durationMs":0.1132910000000038,"status":"-","extra":""}
+{"route":"POST /i18n/translations","payload":"invalid JSON","durationMs":437.81562499999995,"status":400,"extra":""}
+{"route":"GET /i18n/languages","payload":"no token","durationMs":560.0148330000001,"status":401,"extra":""}
+{"route":"GET /lists","payload":"no token","durationMs":570.7439579999999,"status":401,"extra":""}
+{"route":"GET /lists","payload":"no token","durationMs":682.619916,"status":401,"extra":""}
+{"route":"POST /i18n/translations","payload":"array body","durationMs":382.44954200000006,"status":400,"extra":""}
+{"route":"GET /i18n/translations","payload":"no token","durationMs":339.06504199999995,"status":401,"extra":""}
+{"route":"GET /i18n/languages","payload":"no token","durationMs":162.09629199999995,"status":401,"extra":""}
+{"route":"GET /lists/[slug]","payload":"no token","durationMs":164.36362499999996,"status":401,"extra":""}
+{"route":"GET /i18n/languages","payload":"3 languages","durationMs":248.99770799999988,"status":200,"extra":""}
+{"route":"POST /i18n/translations","payload":"empty object","durationMs":192.11575000000016,"status":200,"extra":""}
+{"route":"GET /lists","payload":"invalid token","durationMs":258.80650000000014,"status":401,"extra":""}
+{"route":"POST /i18n/translations","payload":"no token, empty body","durationMs":152.33391699999993,"status":401,"extra":""}
+{"route":"OPTIONS /lists","payload":"preflight","durationMs":240.40866600000004,"status":204,"extra":""}
+{"route":"GET /lists","payload":"2 lists","durationMs":289.92941700000006,"status":200,"extra":""}
+{"route":"POST /i18n/translations","payload":"1 key, 1 language","durationMs":340.432959,"status":200,"extra":""}
+{"route":"GET /lists/[slug]","payload":"non-existent slug","durationMs":210.46787499999982,"status":404,"extra":""}
+{"route":"GET /lists/[slug]","payload":"slug=\"predplatny\"","durationMs":250.58979099999988,"status":200,"extra":""}
+{"route":"GET /lists/test","payload":"7 fields, 1 items","durationMs":217.63529199999994,"status":200,"extra":""}
+{"route":"POST /i18n/translations","payload":"133.2 KB (1000 keys, 2 langs)","durationMs":3830.1395,"status":200,"extra":"~261 keys/s"}
+{"route":"GET /i18n/translations","payload":"all translations","durationMs":2125.048166,"status":200,"extra":""}
+{"route":"GET /i18n/translations","payload":"full project (after bulk)","durationMs":266.11291600000004,"status":200,"extra":""}
+{"route":"POST /i18n/translations","payload":"1 key update","durationMs":269.47325,"status":200,"extra":""}
+{"route":"POST /i18n/translations","payload":"1 key x 2 languages","durationMs":283.2202500000003,"status":200,"extra":""}

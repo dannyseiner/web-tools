@@ -44,8 +44,7 @@ export function AddTranslationModal({
         namespace: namespace.trim() || undefined,
         description: description.trim() || undefined,
       });
-      
-      // Reset form
+
       setKey("");
       setValue("");
       setNamespace("");
@@ -53,7 +52,9 @@ export function AddTranslationModal({
       onClose();
     } catch (error) {
       console.error("Error adding translation:", error);
-      alert(error instanceof Error ? error.message : "Failed to add translation");
+      alert(
+        error instanceof Error ? error.message : "Failed to add translation",
+      );
     } finally {
       setLoading(false);
     }
@@ -63,7 +64,6 @@ export function AddTranslationModal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -72,7 +72,6 @@ export function AddTranslationModal({
             className="fixed inset-0 bg-black/50 z-50"
           />
 
-          {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -80,7 +79,6 @@ export function AddTranslationModal({
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-card border border-border rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             >
-              {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-border">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -91,7 +89,8 @@ export function AddTranslationModal({
                       {t("components.translations.addTranslation")}
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      {t("components.translations.createNewTranslation")} {languageCode.toUpperCase()}
+                      {t("components.translations.createNewTranslation")}{" "}
+                      {languageCode.toUpperCase()}
                     </p>
                   </div>
                 </div>
@@ -103,12 +102,11 @@ export function AddTranslationModal({
                 </button>
               </div>
 
-              {/* Form */}
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                {/* Key */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t("components.translations.translationKey")} <span className="text-destructive">*</span>
+                    {t("components.translations.translationKey")}{" "}
+                    <span className="text-destructive">*</span>
                   </label>
                   <input
                     type="text"
@@ -123,7 +121,6 @@ export function AddTranslationModal({
                   </p>
                 </div>
 
-                {/* Namespace */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {t("components.translations.namespace")}
@@ -132,7 +129,9 @@ export function AddTranslationModal({
                     type="text"
                     value={namespace}
                     onChange={(e) => setNamespace(e.target.value)}
-                    placeholder={t("components.translations.namespacePlaceholder")}
+                    placeholder={t(
+                      "components.translations.namespacePlaceholder",
+                    )}
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
@@ -140,10 +139,10 @@ export function AddTranslationModal({
                   </p>
                 </div>
 
-                {/* Value */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t("components.translations.value")} <span className="text-destructive">*</span>
+                    {t("components.translations.value")}{" "}
+                    <span className="text-destructive">*</span>
                   </label>
                   <textarea
                     value={value}
@@ -155,7 +154,6 @@ export function AddTranslationModal({
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {t("components.translations.description")}
@@ -164,7 +162,9 @@ export function AddTranslationModal({
                     type="text"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder={t("components.translations.descriptionPlaceholder")}
+                    placeholder={t(
+                      "components.translations.descriptionPlaceholder",
+                    )}
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
@@ -172,7 +172,6 @@ export function AddTranslationModal({
                   </p>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-3 pt-4">
                   <button
                     type="button"

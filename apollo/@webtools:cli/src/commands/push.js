@@ -25,9 +25,8 @@ export async function push(token) {
         const files = listJsonFiles(path.join(messagesDir, lang));
 
         for (const file of files) {
-            const ns = path.basename(file, ".json");
             const filePath = path.join(messagesDir, lang, file);
-            payload[lang][ns] = readJson(filePath);
+            Object.assign(payload[lang], readJson(filePath));
             logDim(`read ${relativePath(filePath)}`);
         }
     }

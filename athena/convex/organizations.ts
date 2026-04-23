@@ -2,37 +2,6 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
-/**
- * Get all organizations (public - no auth required)
- * This is useful for public API routes
- */
-export const getAllOrganizations = query({
-  args: {},
-  returns: v.array(
-    v.object({
-      _id: v.id("organizations"),
-      _creationTime: v.number(),
-      name: v.string(),
-      description: v.union(v.string(), v.null()),
-      image: v.union(v.string(), v.null()),
-    }),
-  ),
-  handler: async (ctx) => {
-    const organizations = await ctx.db.query("organizations").collect();
-
-    return organizations.map((org) => ({
-      _id: org._id,
-      _creationTime: org._creationTime,
-      name: org.name,
-      description: org.description ?? null,
-      image: org.image ?? null,
-    }));
-  },
-});
-
-/**
- * Create a new organization and add the creator as an admin
- */
 export const createOrganization = mutation({
   args: {
     name: v.string(),
@@ -49,7 +18,6 @@ export const createOrganization = mutation({
       throw new Error("User must be authenticated to create an organization");
     }
 
-    // Validate name
     if (!args.name || args.name.trim().length === 0) {
       throw new Error("Organization name is required");
     }
@@ -62,14 +30,12 @@ export const createOrganization = mutation({
       throw new Error("Organization name must be less than 100 characters");
     }
 
-    // Validate description if provided
     if (args.description && args.description.length > 500) {
       throw new Error(
         "Organization description must be less than 500 characters",
       );
     }
 
-    // Create the organization
     const organizationId = await ctx.db.insert("organizations", {
       name: args.name.trim(),
       description: args.description?.trim(),
@@ -77,7 +43,6 @@ export const createOrganization = mutation({
       createdBy: userId,
     });
 
-    // Add the creator as an admin
     const memberId = await ctx.db.insert("organizationMembers", {
       organizationId,
       userId,
@@ -88,9 +53,6 @@ export const createOrganization = mutation({
   },
 });
 
-/**
- * Get organizations for the current user
- */
 export const getUserOrganizations = query({
   args: {},
   returns: v.array(
@@ -114,13 +76,11 @@ export const getUserOrganizations = query({
       return [];
     }
 
-    // Get all organization memberships for the user
     const memberships = await ctx.db
       .query("organizationMembers")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
-    // Get organization details for each membership
     const organizations = await Promise.all(
       memberships.map(async (membership) => {
         const org = await ctx.db.get(membership.organizationId);
@@ -136,14 +96,10 @@ export const getUserOrganizations = query({
       }),
     );
 
-    // Filter out any null values
     return organizations.filter((org) => org !== null);
   },
 });
 
-/**
- * Get organization details by ID
- */
 export const getOrganization = query({
   args: {
     organizationId: v.id("organizations"),
@@ -172,7 +128,6 @@ export const getOrganization = query({
       return null;
     }
 
-    // Get user's role in this organization
     let userRole = null;
     if (userId) {
       const membership = await ctx.db
@@ -195,9 +150,6 @@ export const getOrganization = query({
   },
 });
 
-/**
- * Update organization details (Admin only)
- */
 export const updateOrganization = mutation({
   args: {
     organizationId: v.id("organizations"),
@@ -262,7 +214,7 @@ export const getOrganizationMembers = query({
     const membership = await ctx.db
       .query("organizationMembers")
       .withIndex("by_organizationId_and_userId", (q) =>
-        q.eq("organizationId", args.organizationId).eq("userId", userId)
+        q.eq("organizationId", args.organizationId).eq("userId", userId),
       )
       .first();
 
@@ -271,7 +223,7 @@ export const getOrganizationMembers = query({
     const members = await ctx.db
       .query("organizationMembers")
       .withIndex("by_organizationId", (q) =>
-        q.eq("organizationId", args.organizationId)
+        q.eq("organizationId", args.organizationId),
       )
       .collect();
 
@@ -291,7 +243,7 @@ export const getOrganizationMembers = query({
               }
             : null,
         };
-      })
+      }),
     );
 
     return membersWithDetails.filter((m) => m.user !== null);
@@ -301,7 +253,11 @@ export const getOrganizationMembers = query({
 export const updateMemberRole = mutation({
   args: {
     memberId: v.id("organizationMembers"),
-    role: v.union(v.literal("Member"), v.literal("Manager"), v.literal("Admin")),
+    role: v.union(
+      v.literal("Member"),
+      v.literal("Manager"),
+      v.literal("Admin"),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -313,7 +269,7 @@ export const updateMemberRole = mutation({
     const adminMembership = await ctx.db
       .query("organizationMembers")
       .withIndex("by_organizationId_and_userId", (q) =>
-        q.eq("organizationId", member.organizationId).eq("userId", userId)
+        q.eq("organizationId", member.organizationId).eq("userId", userId),
       )
       .first();
 
@@ -339,7 +295,7 @@ export const removeMember = mutation({
     const adminMembership = await ctx.db
       .query("organizationMembers")
       .withIndex("by_organizationId_and_userId", (q) =>
-        q.eq("organizationId", member.organizationId).eq("userId", userId)
+        q.eq("organizationId", member.organizationId).eq("userId", userId),
       )
       .first();
 

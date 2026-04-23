@@ -28,14 +28,7 @@ import { useTranslations } from "next-intl";
 interface FieldDef {
   name: string;
   label: string;
-  type:
-    | "text"
-    | "number"
-    | "boolean"
-    | "date"
-    | "select"
-    | "url"
-    | "richtext";
+  type: "text" | "number" | "boolean" | "date" | "select" | "url" | "richtext";
   required: boolean;
   options?: string[];
   defaultValue?: string;
@@ -76,9 +69,7 @@ export function CreateListDialog({
   const tCommon = useTranslations("common");
 
   const [name, setName] = useState(editList?.name ?? "");
-  const [description, setDescription] = useState(
-    editList?.description ?? "",
-  );
+  const [description, setDescription] = useState(editList?.description ?? "");
   const [fields, setFields] = useState<FieldDef[]>(
     editList?.fields ?? [
       { name: "title", label: "Title", type: "text", required: true },
@@ -162,8 +153,13 @@ export function CreateListDialog({
         setError(t("createDialog.errors.fieldNeedsLabel", { number: i + 1 }));
         return;
       }
-      if (fields[i].type === "select" && (!fields[i].options || fields[i].options!.length === 0)) {
-        setError(t("createDialog.errors.fieldNeedsOption", { label: fields[i].label }));
+      if (
+        fields[i].type === "select" &&
+        (!fields[i].options || fields[i].options!.length === 0)
+      ) {
+        setError(
+          t("createDialog.errors.fieldNeedsOption", { label: fields[i].label }),
+        );
         return;
       }
     }
@@ -206,7 +202,9 @@ export function CreateListDialog({
       <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? t("createDialog.editTitle") : t("createDialog.createTitle")}
+            {isEditing
+              ? t("createDialog.editTitle")
+              : t("createDialog.createTitle")}
           </DialogTitle>
           <DialogDescription>
             {isEditing
@@ -390,9 +388,7 @@ export function CreateListDialog({
             </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
         <DialogFooter>
@@ -405,7 +401,9 @@ export function CreateListDialog({
           </Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
             {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {isEditing ? t("createDialog.saveButton") : t("createDialog.createButton")}
+            {isEditing
+              ? t("createDialog.saveButton")
+              : t("createDialog.createButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

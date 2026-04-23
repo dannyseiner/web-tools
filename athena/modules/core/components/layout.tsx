@@ -41,6 +41,7 @@ export type LayoutProps = {
   organizationId?: string;
 };
 
+// Dynamic layout template for main layout, project layout and organzations layout
 export const Layout = ({
   links,
   children,
@@ -83,18 +84,15 @@ export const Layout = ({
 
   return (
     <div className="flex flex-row h-screen w-full bg-white overflow-hidden">
-      {/* Desktop Sidebar - Hidden on mobile */}
       <aside
         className={`${
           isExpanded ? "w-64" : "w-20"
         } bg-white border-r border-border transition-all duration-300 ease-in-out flex-col hidden lg:flex`}
       >
-        {/* Logo Section */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border">
           {isExpanded ? <Logo text={true} /> : <Logo text={false} />}
         </div>
 
-        {/* Navigation Items */}
         <nav className="flex-1 py-4 px-2 overflow-y-auto">
           <TooltipProvider delayDuration={0}>
             <ul className="space-y-1">
@@ -144,7 +142,6 @@ export const Layout = ({
           </TooltipProvider>
         </nav>
 
-        {/* User Section */}
         <div className="p-4 border-t border-border">
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -156,7 +153,6 @@ export const Layout = ({
                   }`}
                 >
                   {profile === undefined ? (
-                    // Loading state
                     <>
                       <div className="h-9 w-9 shrink-0 rounded-full bg-muted animate-pulse" />
                       {isExpanded && (
@@ -167,7 +163,6 @@ export const Layout = ({
                       )}
                     </>
                   ) : profile === null ? (
-                    // Not logged in
                     <>
                       <Avatar className="h-9 w-9 shrink-0">
                         <AvatarFallback className="bg-muted text-muted-foreground">
@@ -186,7 +181,6 @@ export const Layout = ({
                       )}
                     </>
                   ) : (
-                    // Logged in user
                     <>
                       <Avatar className="h-9 w-9 shrink-0">
                         {profile.image && (
@@ -229,7 +223,6 @@ export const Layout = ({
           </TooltipProvider>
         </div>
 
-        {/* Toggle Button */}
         <div className="p-2 border-t border-border">
           <Button
             variant="ghost"
@@ -249,7 +242,6 @@ export const Layout = ({
         </div>
       </aside>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -268,7 +260,6 @@ export const Layout = ({
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed inset-y-0 left-0 w-80 bg-white border-r border-border z-50 flex flex-col lg:hidden"
             >
-              {/* Mobile Menu Header */}
               <div className="h-16 flex items-center justify-between px-4 border-b border-border">
                 <Logo text={true} />
                 <Button
@@ -281,7 +272,6 @@ export const Layout = ({
                 </Button>
               </div>
 
-              {/* Mobile Navigation */}
               <nav className="flex-1 py-4 px-2 overflow-y-auto">
                 <ul className="space-y-1">
                   {links.map((item, idx) => {
@@ -313,7 +303,6 @@ export const Layout = ({
                 </ul>
               </nav>
 
-              {/* Mobile User Section */}
               <div className="p-4 border-t border-border">
                 <div
                   onClick={() => {
@@ -376,12 +365,9 @@ export const Layout = ({
         )}
       </AnimatePresence>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <header className="h-16 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 shrink-0">
           <div className="flex items-center gap-4">
-            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="sm"
@@ -395,7 +381,10 @@ export const Layout = ({
             </h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <NotificationBell visible={showNotifications} organizationId={organizationId} />
+            <NotificationBell
+              visible={showNotifications}
+              organizationId={organizationId}
+            />
             {showNotifications && (
               <div className="w-px h-6 bg-border hidden sm:block" />
             )}
@@ -413,7 +402,6 @@ export const Layout = ({
           </div>
         </header>
 
-        {/* Main Content with Dim Background */}
         <main className="flex-1 overflow-y-auto bg-background-dim">
           {children}
         </main>

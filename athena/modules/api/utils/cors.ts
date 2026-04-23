@@ -1,6 +1,4 @@
-/**
- * CORS headers for public API routes so they can be called from any origin (e.g. Hermes on another port).
- */
+// CORS override for public API
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",

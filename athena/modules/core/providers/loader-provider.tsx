@@ -28,7 +28,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
     loading: false,
   });
 
-  // Auto-close loader after 1.7 seconds when state is success (but not error)
   useEffect(() => {
     if (loadingState.loading && loadingState.state === "success") {
       const timer = setTimeout(() => {
@@ -57,12 +56,9 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
             transition={{ duration: 0.3 }}
             className="fixed top-0 left-0 z-9999 flex h-screen w-full flex-col items-center justify-center bg-background-dim/55 backdrop-blur-md"
           >
-            {/* Main Content */}
             <div className="relative flex flex-col items-center gap-10">
-              {/* Loader Animation */}
               <div className="relative flex h-28 w-28 items-center justify-center">
                 {loadingState.state ? (
-                  // Success/Error State
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -73,7 +69,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                     }}
                     className="relative flex items-center justify-center"
                   >
-                    {/* Glow */}
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 0.4 }}
@@ -86,7 +81,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                       )}
                     />
 
-                    {/* Circle */}
                     <motion.div
                       className={cn(
                         "relative flex h-20 w-20 items-center justify-center rounded-full border-2",
@@ -120,9 +114,7 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                     </motion.div>
                   </motion.div>
                 ) : (
-                  // Loading State — spinning ring + icon
                   <>
-                    {/* Spinning Ring */}
                     <motion.svg
                       width="112"
                       height="112"
@@ -167,7 +159,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                       />
                     </motion.svg>
 
-                    {/* Subtle outer pulse ring */}
                     <motion.div
                       className="absolute h-28 w-28 rounded-full border border-primary/20"
                       animate={{
@@ -181,7 +172,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                       }}
                     />
 
-                    {/* Center Icon */}
                     <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -198,7 +188,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
 
-              {/* Text Content */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -230,7 +219,6 @@ export const LoaderProvider = ({ children }: { children: React.ReactNode }) => {
                   </motion.p>
                 )}
 
-                {/* Loading Dots */}
                 {!loadingState.state && (
                   <motion.div
                     initial={{ opacity: 0 }}

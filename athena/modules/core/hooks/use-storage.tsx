@@ -9,7 +9,6 @@ export function useStorage<T>(
   key: string,
   defaultValue?: T,
 ): [T | undefined, (value: SetValue<T | undefined>) => void] {
-  // Initialize state from localStorage
   const [storedValue, setStoredValue] = useState<T | undefined>(() => {
     if (typeof window === "undefined") {
       return defaultValue;
@@ -27,11 +26,9 @@ export function useStorage<T>(
     }
   });
 
-  // Update localStorage when value changes
   const setValue = useCallback(
     (value: SetValue<T | undefined>) => {
       try {
-        // Allow value to be a function like useState
         const valueToStore =
           value instanceof Function ? value(storedValue) : value;
 
@@ -51,7 +48,6 @@ export function useStorage<T>(
     [key, storedValue],
   );
 
-  // Sync state when storage changes in other tabs/windows
   useEffect(() => {
     if (typeof window === "undefined") {
       return;

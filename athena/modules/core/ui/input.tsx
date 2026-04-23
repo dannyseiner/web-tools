@@ -25,7 +25,6 @@ function Input({
 
   return (
     <div className={cn("w-full", containerClassName)}>
-      {/* Input Container - All styling here */}
       <div
         className={cn(
           "relative flex items-center w-full h-12 rounded-md border border-input bg-background shadow-xs transition-[border-color,box-shadow]",
@@ -36,7 +35,6 @@ function Input({
           className,
         )}
       >
-        {/* Left Icon */}
         {hasIcon && iconPosition === "left" && (
           <Icon
             className={cn(
@@ -46,7 +44,6 @@ function Input({
           />
         )}
 
-        {/* Transparent Input */}
         <input
           type={type}
           className={cn(
@@ -61,7 +58,6 @@ function Input({
           {...props}
         />
 
-        {/* Right Icon */}
         {hasIcon && iconPosition === "right" && (
           <Icon
             className={cn(
@@ -72,7 +68,6 @@ function Input({
         )}
       </div>
 
-      {/* Error Message */}
       {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
     </div>
   );

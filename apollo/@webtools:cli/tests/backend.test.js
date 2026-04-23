@@ -70,12 +70,3 @@ describe("CORS", () => {
     });
 });
 
-describe("public endpoints", () => {
-    it("GET /organizations works without a token", async () => {
-        const start = performance.now();
-        const res = await fetch(`${API_BASE}/organizations`);
-        const ms = performance.now() - start;
-        record("GET /organizations", "public, no token", ms, res.status);
-        expect([200, 204]).toContain(res.status);
-    });
-});
