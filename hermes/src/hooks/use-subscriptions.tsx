@@ -20,7 +20,7 @@ export function useSubscriptions<T = unknown>() {
           throw new Error(`Request failed with status ${res.status}`);
         }
         const json = (await res.json()) as T;
-        if (json?.items) {
+        if ((json as unknown as { items: T[] })?.items) {
           setData(json);
         }
         setError(null);

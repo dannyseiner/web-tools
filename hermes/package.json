@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npx @uu-webtools/cli pull",
+    "prebuild": "npx @uu-webtools/cli pull",
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
