@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import {
   Loader2,
@@ -15,18 +15,31 @@ import {
   Copy,
   Check,
   FolderKanban,
+  Trash2,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { exportWithProjectLayout } from "@/modules/core/layouts/project-layout";
 import { FileUpload, UploadedFile } from "@/modules/core/ui/file-upload";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/modules/core/ui/alert-dialog";
 
 function ProjectSettingsPage() {
   const params = useParams();
+  const router = useRouter();
   const projectId = params.projectId as Id<"projects">;
   const organizationId = params.id as Id<"organizations">;
   const t = useTranslations("pages.projectSettings");
+  const tCommon = useTranslations("common");
 
   const project = useQuery(api.projects.getProject, { projectId });
   const organization = useQuery(api.organizations.getOrganization, {
@@ -37,6 +50,7 @@ function ProjectSettingsPage() {
   });
   const updateProject = useMutation(api.projects.updateProject);
   const generateToken = useMutation(api.projects.generateApiToken);
+  const deleteProject = useMutation(api.projects.deleteProject);
 
   const canManageProject =
     organization?.userRole === "Admin" || organization?.userRole === "Manager";
@@ -51,6 +65,9 @@ function ProjectSettingsPage() {
   const [tokenRevealed, setTokenRevealed] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (project) {
@@ -109,6 +126,18 @@ function ProjectSettingsPage() {
       navigator.clipboard.writeText(apiKey);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  async function handleDeleteProject() {
+    setDeleting(true);
+    try {
+      await deleteProject({ projectId });
+      router.push(`/organizations/${organizationId}`);
+    } catch (err) {
+      console.error("Failed to delete project", err);
+      setDeleting(false);
+      setDeleteDialogOpen(false);
     }
   }
 
@@ -335,6 +364,66 @@ function ProjectSettingsPage() {
           )}
         </div>
       </motion.div>
+
+      {canManageProject && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-xl border border-destructive/40 bg-destructive/5 p-6 space-y-4"
+        >
+          <div>
+            <h2 className="text-lg font-semibold text-destructive">
+              {t("dangerZone")}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {t("dangerZoneDesc")}
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setDeleteDialogOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+              {t("deleteProject")}
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("deleteProjectConfirmTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteProjectConfirmDesc", { name: project?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>
+              {tCommon("cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteProject();
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("deleteProject")
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

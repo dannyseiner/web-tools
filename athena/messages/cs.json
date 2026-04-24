@@ -309,6 +309,7 @@
       },
       "removeMember": "Odebrat člena",
       "confirmRemove": "Opravdu chcete odebrat tohoto člena?",
+      "confirmRemoveNamed": "Opravdu chcete odebrat {name} z organizace? Tuto akci nelze vrátit zpět.",
       "failedToUpdateRole": "Nepodařilo se aktualizovat roli",
       "failedToRemove": "Nepodařilo se odebrat člena",
       "accessDenied": "Přístup odepřen",
@@ -391,7 +392,12 @@
       "regenerateWarning": "Vygenerování nového tokenu zneplatní ten stávající",
       "hide": "Skrýt",
       "reveal": "Zobrazit",
-      "copy": "Kopírovat"
+      "copy": "Kopírovat",
+      "dangerZone": "Nebezpečná zóna",
+      "dangerZoneDesc": "Jakmile projekt smažete, nelze jej obnovit.",
+      "deleteProject": "Smazat projekt",
+      "deleteProjectConfirmTitle": "Smazat projekt",
+      "deleteProjectConfirmDesc": "Opravdu chcete smazat {name}? Tuto akci nelze vrátit zpět."
     },
     "organizationSettings": {
       "title": "Nastavení organizace",
@@ -444,6 +450,8 @@
         "memberLeft": "{memberName} opustil {organizationName}",
         "projectCreated": "{createdBy} vytvořil {projectName} v {organizationName}",
         "projectDeleted": "{deletedBy} smazal {projectName} z {organizationName}",
+        "projectTokenRegenerated": "{regeneratedBy} přegeneroval API token pro {projectName} v {organizationName}",
+        "projectUpdated": "{updatedBy} upravil detaily projektu {projectName} v {organizationName}",
         "default": "Nové oznámení"
       }
     },

@@ -309,6 +309,7 @@
       },
       "removeMember": "Remove member",
       "confirmRemove": "Are you sure you want to remove this member?",
+      "confirmRemoveNamed": "Are you sure you want to remove {name} from the organization? This action cannot be undone.",
       "failedToUpdateRole": "Failed to update role",
       "failedToRemove": "Failed to remove member",
       "accessDenied": "Access denied",
@@ -391,7 +392,12 @@
       "regenerateWarning": "Generating a new token invalidates the existing one",
       "hide": "Hide",
       "reveal": "Reveal",
-      "copy": "Copy"
+      "copy": "Copy",
+      "dangerZone": "Danger zone",
+      "dangerZoneDesc": "Once you delete a project, there is no going back.",
+      "deleteProject": "Delete project",
+      "deleteProjectConfirmTitle": "Delete project",
+      "deleteProjectConfirmDesc": "Are you sure you want to delete {name}? This action cannot be undone."
     },
     "organizationSettings": {
       "title": "Organization settings",
@@ -444,6 +450,8 @@
         "memberLeft": "{memberName} left {organizationName}",
         "projectCreated": "{createdBy} created {projectName} in {organizationName}",
         "projectDeleted": "{deletedBy} deleted {projectName} from {organizationName}",
+        "projectTokenRegenerated": "{regeneratedBy} regenerated the API token for {projectName} in {organizationName}",
+        "projectUpdated": "{updatedBy} updated the details of {projectName} in {organizationName}",
         "default": "New notification"
       }
     },

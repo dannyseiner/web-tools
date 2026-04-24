@@ -96,10 +96,22 @@ export function NotificationBell({ visible = true, organizationId }: Notificatio
             organizationName: data.organizationName 
           });
         case "PROJECT_DELETED":
-          return t("components.notifications.types.projectDeleted", { 
-            deletedBy: data.deletedBy, 
-            projectName: data.projectName, 
-            organizationName: data.organizationName 
+          return t("components.notifications.types.projectDeleted", {
+            deletedBy: data.deletedBy,
+            projectName: data.projectName,
+            organizationName: data.organizationName
+          });
+        case "PROJECT_TOKEN_REGENERATED":
+          return t("components.notifications.types.projectTokenRegenerated", {
+            regeneratedBy: data.regeneratedBy,
+            projectName: data.projectName,
+            organizationName: data.organizationName,
+          });
+        case "PROJECT_UPDATED":
+          return t("components.notifications.types.projectUpdated", {
+            updatedBy: data.updatedBy,
+            projectName: data.projectName,
+            organizationName: data.organizationName,
           });
         default:
           return t("components.notifications.types.default");

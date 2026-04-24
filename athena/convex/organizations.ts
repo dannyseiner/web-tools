@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { NOTIFICATION_TYPES } from "./schemes/notifications";
 
 export const createOrganization = mutation({
   args: {
@@ -308,5 +309,29 @@ export const removeMember = mutation({
     }
 
     await ctx.db.delete(args.memberId);
+
+    const organization = await ctx.db.get(member.organizationId);
+    const removedUser = await ctx.db.get(member.userId);
+    if (organization && removedUser) {
+      const members = await ctx.db
+        .query("organizationMembers")
+        .withIndex("by_organizationId", (q) =>
+          q.eq("organizationId", member.organizationId),
+        )
+        .collect();
+      const data = JSON.stringify({
+        memberName: removedUser.name ?? removedUser.email ?? "Member",
+        organizationName: organization.name,
+      });
+      for (const m of members) {
+        await ctx.db.insert("notifications", {
+          userId: m.userId,
+          organizationId: member.organizationId,
+          type: NOTIFICATION_TYPES.MEMBER_LEFT,
+          data,
+          read: false,
+        });
+      }
+    }
   },
 });

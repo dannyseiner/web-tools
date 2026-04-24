@@ -28,6 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/modules/core/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/modules/core/ui/alert-dialog";
 import { useTranslations } from "next-intl";
 
 function OrganizationMembersPage() {
@@ -36,6 +46,8 @@ function OrganizationMembersPage() {
   const t = useTranslations();
   const organizationId = params.id as Id<"organizations">;
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] =
+    useState<{ id: Id<"organizationMembers">; name: string } | null>(null);
 
   const organization = useQuery(api.organizations.getOrganization, {
     organizationId,
@@ -70,12 +82,14 @@ function OrganizationMembersPage() {
     }
   };
 
-  const handleRemoveMember = async (memberId: Id<"organizationMembers">) => {
-    if (!confirm(t("pages.members.confirmRemove"))) return;
+  const confirmRemoveMember = async () => {
+    if (!memberToRemove) return;
     try {
-      await removeMember({ memberId });
+      await removeMember({ memberId: memberToRemove.id });
     } catch (err) {
       console.error("Failed to remove member", err);
+    } finally {
+      setMemberToRemove(null);
     }
   };
 
@@ -314,7 +328,15 @@ function OrganizationMembersPage() {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleRemoveMember(member._id)}
+                      onClick={() =>
+                        setMemberToRemove({
+                          id: member._id,
+                          name:
+                            member.user?.name ??
+                            member.user?.email ??
+                            "",
+                        })
+                      }
                       className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                       title={t("pages.members.removeMember")}
                     >
@@ -403,6 +425,37 @@ function OrganizationMembersPage() {
         open={inviteModalOpen}
         onOpenChange={setInviteModalOpen}
       />
+
+      <AlertDialog
+        open={memberToRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) setMemberToRemove(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("pages.members.removeMember")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {memberToRemove?.name
+                ? t("pages.members.confirmRemoveNamed", {
+                    name: memberToRemove.name,
+                  })
+                : t("pages.members.confirmRemove")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRemoveMember}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("pages.members.removeMember")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

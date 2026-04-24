@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { NOTIFICATION_TYPES } from "./schemes/notifications";
 
 export const createProject = mutation({
   args: {
@@ -45,7 +46,91 @@ export const createProject = mutation({
       supportedLanguages: args.defaultLanguage ? [args.defaultLanguage] : [],
     });
 
+    const organization = await ctx.db.get(args.organizationId);
+    const creator = await ctx.db.get(userId);
+    if (organization && creator) {
+      const members = await ctx.db
+        .query("organizationMembers")
+        .withIndex("by_organizationId", (q) =>
+          q.eq("organizationId", args.organizationId),
+        )
+        .collect();
+      const data = JSON.stringify({
+        projectName: args.name,
+        organizationName: organization.name,
+        createdBy: creator.name ?? creator.email ?? "Someone",
+      });
+      for (const m of members) {
+        await ctx.db.insert("notifications", {
+          userId: m.userId,
+          organizationId: args.organizationId,
+          type: NOTIFICATION_TYPES.PROJECT_CREATED,
+          data,
+          read: false,
+        });
+      }
+    }
+
     return projectId;
+  },
+});
+
+export const deleteProject = mutation({
+  args: {
+    projectId: v.id("projects"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Not authenticated");
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_organizationId_and_userId", (q) =>
+        q.eq("organizationId", project.organizationId).eq("userId", userId),
+      )
+      .first();
+
+    if (!membership) throw new Error("Not a member");
+    if (membership.role === "Member")
+      throw new Error("Only Admins and Managers can delete projects");
+
+    const settings = await ctx.db
+      .query("projectSettings")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .first();
+    if (settings) {
+      await ctx.db.delete(settings._id);
+    }
+
+    await ctx.db.delete(args.projectId);
+
+    const organization = await ctx.db.get(project.organizationId);
+    const deleter = await ctx.db.get(userId);
+    if (organization && deleter) {
+      const members = await ctx.db
+        .query("organizationMembers")
+        .withIndex("by_organizationId", (q) =>
+          q.eq("organizationId", project.organizationId),
+        )
+        .collect();
+      const data = JSON.stringify({
+        projectName: project.name,
+        organizationName: organization.name,
+        deletedBy: deleter.name ?? deleter.email ?? "Someone",
+      });
+      for (const m of members) {
+        await ctx.db.insert("notifications", {
+          userId: m.userId,
+          organizationId: project.organizationId,
+          type: NOTIFICATION_TYPES.PROJECT_DELETED,
+          data,
+          read: false,
+        });
+      }
+    }
   },
 });
 
@@ -176,11 +261,44 @@ export const updateProject = mutation({
     if (membership.role === "Member")
       throw new Error("Only Admins and Managers can update projects");
 
+    const hasChanges =
+      project.name !== args.name ||
+      (project.description ?? undefined) !== args.description ||
+      (project.image ?? undefined) !== args.image;
+
     await ctx.db.patch(args.projectId, {
       name: args.name,
       description: args.description,
       image: args.image,
     });
+
+    if (hasChanges) {
+      const organization = await ctx.db.get(project.organizationId);
+      const actor = await ctx.db.get(userId);
+      if (organization && actor) {
+        const members = await ctx.db
+          .query("organizationMembers")
+          .withIndex("by_organizationId", (q) =>
+            q.eq("organizationId", project.organizationId),
+          )
+          .collect();
+        const data = JSON.stringify({
+          projectName: args.name,
+          organizationName: organization.name,
+          updatedBy: actor.name ?? actor.email ?? "Someone",
+        });
+        for (const m of members) {
+          if (m.userId === userId) continue;
+          await ctx.db.insert("notifications", {
+            userId: m.userId,
+            organizationId: project.organizationId,
+            type: NOTIFICATION_TYPES.PROJECT_UPDATED,
+            data,
+            read: false,
+          });
+        }
+      }
+    }
   },
 });
 
@@ -211,11 +329,14 @@ export const generateApiToken = mutation({
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .first();
 
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let token = "wt_";
     for (let i = 0; i < 32; i++) {
       token += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+
+    const wasRegenerated = settings?.apiKey !== token;
 
     if (settings) {
       await ctx.db.patch(settings._id, { apiKey: token });
@@ -225,6 +346,33 @@ export const generateApiToken = mutation({
         supportedLanguages: [],
         apiKey: token,
       });
+    }
+
+    if (wasRegenerated) {
+      const organization = await ctx.db.get(project.organizationId);
+      const actor = await ctx.db.get(userId);
+      if (organization && actor) {
+        const members = await ctx.db
+          .query("organizationMembers")
+          .withIndex("by_organizationId", (q) =>
+            q.eq("organizationId", project.organizationId),
+          )
+          .collect();
+        const data = JSON.stringify({
+          projectName: project.name,
+          organizationName: organization.name,
+          regeneratedBy: actor.name ?? actor.email ?? "Someone",
+        });
+        for (const m of members) {
+          await ctx.db.insert("notifications", {
+            userId: m.userId,
+            organizationId: project.organizationId,
+            type: NOTIFICATION_TYPES.PROJECT_TOKEN_REGENERATED,
+            data,
+            read: false,
+          });
+        }
+      }
     }
 
     return token;

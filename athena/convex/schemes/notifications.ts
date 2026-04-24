@@ -10,6 +10,8 @@ export const NOTIFICATION_TYPES = {
   MEMBER_LEFT: "MEMBER_LEFT",
   PROJECT_CREATED: "PROJECT_CREATED",
   PROJECT_DELETED: "PROJECT_DELETED",
+  PROJECT_TOKEN_REGENERATED: "PROJECT_TOKEN_REGENERATED",
+  PROJECT_UPDATED: "PROJECT_UPDATED",
 } as const;
 
 export type NotificationType =
@@ -48,6 +50,16 @@ export interface NotificationData {
     projectName: string;
     organizationName: string;
     deletedBy: string;
+  };
+  [NOTIFICATION_TYPES.PROJECT_TOKEN_REGENERATED]: {
+    projectName: string;
+    organizationName: string;
+    regeneratedBy: string;
+  };
+  [NOTIFICATION_TYPES.PROJECT_UPDATED]: {
+    projectName: string;
+    organizationName: string;
+    updatedBy: string;
   };
 }
 
