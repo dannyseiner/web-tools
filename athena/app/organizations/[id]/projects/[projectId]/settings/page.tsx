@@ -32,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/modules/core/ui/alert-dialog";
+import { toast } from "react-toastify";
 
 function ProjectSettingsPage() {
   const params = useParams();
@@ -136,6 +137,7 @@ function ProjectSettingsPage() {
       router.push(`/organizations/${organizationId}`);
     } catch (err) {
       console.error("Failed to delete project", err);
+      toast.error(t("pages.projectSettings.failedToDeleteProject"));
       setDeleting(false);
       setDeleteDialogOpen(false);
     }
@@ -193,12 +195,7 @@ function ProjectSettingsPage() {
             <div className="flex items-center gap-4">
               <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-border shadow-sm shrink-0">
                 {image.startsWith("data:") ? (
-                  <Image
-                    src={image}
-                    alt={name}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={image} alt={name} fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full bg-linear-to-br from-primary to-purple-600 flex items-center justify-center">
                     <FolderKanban className="h-8 w-8 text-white" />
@@ -271,9 +268,7 @@ function ProjectSettingsPage() {
             <h2 className="text-lg font-semibold text-foreground">
               {t("apiToken")}
             </h2>
-            <p className="text-sm text-muted-foreground">
-              {t("apiTokenDesc")}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("apiTokenDesc")}</p>
           </div>
         </div>
 

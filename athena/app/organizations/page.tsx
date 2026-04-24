@@ -21,6 +21,7 @@ import { exportWithMainLayout } from "@/modules/core/layouts/main-layout";
 import { useTranslations } from "next-intl";
 import { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
 function OrganizationsPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ function OrganizationsPage() {
       await acceptInvite({ inviteId });
     } catch (err) {
       console.error("Failed to accept invite", err);
-      alert(t("pages.organizations.invitations.failedToAccept"));
+      toast.error(t("pages.organizations.invitations.failedToAccept"));
     }
   };
 

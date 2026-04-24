@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
 } from "@/modules/core/ui/alert-dialog";
 import { useTranslations } from "next-intl";
+import { toast } from "react-toastify";
 
 function OrganizationMembersPage() {
   const params = useParams();
@@ -46,8 +47,10 @@ function OrganizationMembersPage() {
   const t = useTranslations();
   const organizationId = params.id as Id<"organizations">;
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [memberToRemove, setMemberToRemove] =
-    useState<{ id: Id<"organizationMembers">; name: string } | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<{
+    id: Id<"organizationMembers">;
+    name: string;
+  } | null>(null);
 
   const organization = useQuery(api.organizations.getOrganization, {
     organizationId,
@@ -73,12 +76,13 @@ function OrganizationMembersPage() {
 
   const handleRoleChange = async (
     memberId: Id<"organizationMembers">,
-    role: "Member" | "Manager" | "Admin"
+    role: "Member" | "Manager" | "Admin",
   ) => {
     try {
       await updateMemberRole({ memberId, role });
     } catch (err) {
       console.error("Failed to update role", err);
+      toast.error(t("pages.members.failedToUpdateRole"));
     }
   };
 
@@ -88,6 +92,7 @@ function OrganizationMembersPage() {
       await removeMember({ memberId: memberToRemove.id });
     } catch (err) {
       console.error("Failed to remove member", err);
+      toast.error(t("pages.members.failedToRemove"));
     } finally {
       setMemberToRemove(null);
     }
@@ -98,6 +103,7 @@ function OrganizationMembersPage() {
       await deleteInvite({ inviteId });
     } catch (err) {
       console.error("Failed to delete invite", err);
+      toast.error(t("pages.members.failedToDeleteInvite"));
     }
   };
 
@@ -137,7 +143,9 @@ function OrganizationMembersPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">{t("pages.members.loadingMembers")}</p>
+          <p className="text-muted-foreground">
+            {t("pages.members.loadingMembers")}
+          </p>
         </div>
       </div>
     );
@@ -197,7 +205,9 @@ function OrganizationMembersPage() {
               {t("pages.members.title")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground truncate">
-              {t("pages.members.subtitle", { organizationName: organization.name })}
+              {t("pages.members.subtitle", {
+                organizationName: organization.name,
+              })}
             </p>
           </div>
         </div>
@@ -287,7 +297,7 @@ function OrganizationMembersPage() {
                       onValueChange={(value) =>
                         handleRoleChange(
                           member._id,
-                          value as "Member" | "Manager" | "Admin"
+                          value as "Member" | "Manager" | "Admin",
                         )
                       }
                     >
@@ -331,10 +341,7 @@ function OrganizationMembersPage() {
                       onClick={() =>
                         setMemberToRemove({
                           id: member._id,
-                          name:
-                            member.user?.name ??
-                            member.user?.email ??
-                            "",
+                          name: member.user?.name ?? member.user?.email ?? "",
                         })
                       }
                       className="p-2 text-muted-foreground hover:text-destructive transition-colors"
@@ -375,7 +382,9 @@ function OrganizationMembersPage() {
                   <Mail className="h-6 w-6 text-primary" />
                 </div>
               </div>
-              <p className="text-muted-foreground">{t("components.employeesSection.noPendingInvitations")}</p>
+              <p className="text-muted-foreground">
+                {t("components.employeesSection.noPendingInvitations")}
+              </p>
             </div>
           ) : (
             <div className="space-y-2">

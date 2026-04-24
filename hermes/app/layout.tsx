@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { loadMessages, LOCALE_COOKIE_NAME } from "@webtools/client/server";
+import {
+  loadAllMessages,
+  loadMessages,
+  LOCALE_COOKIE_NAME,
+} from "@webtools/client/server";
 import path from "path";
 import { cookies } from "next/headers";
 import "./globals.css";
@@ -33,15 +37,16 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const locale = cookieStore.get(LOCALE_COOKIE_NAME)?.value ?? "cs";
   const raw = await loadMessages(locale, path.join(process.cwd(), "messages"));
-  const messages: Record<string, unknown> = {};
-  for (const [ns, content] of Object.entries(raw)) {
-    const inner = content as Record<string, unknown>;
-    messages[ns] = inner[ns] ?? inner;
-  }
+
+  // const messages: Record<string, unknown> = {};
+  // for (const [ns, content] of Object.entries(raw)) {
+  //   const inner = content as Record<string, unknown>;
+  //   messages[ns] = inner[ns] ?? inner;
+  // }
 
   return (
     <NextErrorProvider>
-      <I18nProvider locale={locale} messages={messages}>
+      <I18nProvider locale={locale} messages={raw?.common}>
         <ErrorBoundary>
           <html lang={locale}>
             <body

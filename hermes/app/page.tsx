@@ -21,7 +21,6 @@ export default function Home() {
     loading: subscriptionsLoading,
     error: subscriptionsError,
   } = useSubscriptions();
-  console.log("subscriptions", subscriptions);
 
   const [customErrorTitle, setCustomErrorTitle] = useState("");
   const [customErrorStatus, setCustomErrorStatus] = useState<{
